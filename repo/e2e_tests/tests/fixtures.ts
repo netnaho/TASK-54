@@ -1,8 +1,8 @@
 import { Page, expect } from '@playwright/test';
 
 export const USERS = {
-  admin:        { email: 'admin@careops.local',      password: 'Admin!2345' },
-  nurse:        { email: 'nurse@careops.local',       password: 'Nurse!2345' },
+  admin:        { email: 'admin@careops.local',      password: 'Admin!234567' },
+  nurse:        { email: 'nurse@careops.local',       password: 'Nurse!234567' },
   finance:      { email: 'finance@careops.local',     password: 'Finance!2345' },
   training:     { email: 'training@careops.local',    password: 'Training!2345' },
 };
