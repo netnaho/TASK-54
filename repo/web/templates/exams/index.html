@@ -1,0 +1,88 @@
+{{$d := .Data}}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Competency Exams</h1>
+      <p class="page-subtitle">Exam templates, scheduled sessions, and conflict tracking</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="/exams/scheduler" class="btn btn-secondary">Timeline View</a>
+      <a href="/exams/sessions/new" class="btn btn-secondary">+ Schedule Session</a>
+      <a href="/exams/templates/new" class="btn btn-primary">+ New Template</a>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Exam Templates</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Target Role</th>
+          <th>Duration</th>
+          <th>Window</th>
+          <th>Passing Score</th>
+          <th>Version</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range (index $d "Templates")}}
+        <tr>
+          <td class="td-primary">{{.Title}}</td>
+          <td><span class="badge">{{.RoleScope}}</span></td>
+          <td>{{.DurationMinutes}} min</td>
+          <td>{{.WindowStart}}–{{.WindowEnd}}</td>
+          <td>{{.PassingScore}}%</td>
+          <td><span class="badge badge-info">v{{.TemplateVersion}}</span></td>
+          <td>{{if .IsActive}}<span class="status-dot status-active">Active</span>{{else}}<span class="status-dot status-inactive">Inactive</span>{{end}}</td>
+          <td><a href="/exams/templates/{{.ID}}" class="btn btn-ghost btn-sm">Edit</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="8" class="td-empty">No templates defined. <a href="/exams/templates/new">Create one.</a></td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Recent Sessions</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Exam</th>
+          <th>Planned Start</th>
+          <th>Room</th>
+          <th>Status</th>
+          <th>Candidates</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range (index $d "Sessions")}}
+        <tr>
+          <td class="td-primary">{{.TemplateTitle}}</td>
+          <td>{{fmtFacilityDateTime .PlannedStart}}</td>
+          <td>{{.Room}}</td>
+          <td>
+            {{if .IsDraft}}
+              <span class="badge badge-warn">Draft</span>
+            {{else}}
+              <span class="badge badge-ok">Published</span>
+            {{end}}
+          </td>
+          <td>{{len .Candidates}}</td>
+          <td><a href="/exams/sessions/{{.ID}}" class="btn btn-ghost btn-sm">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="td-empty">No sessions scheduled. <a href="/exams/sessions/new">Generate one.</a></td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

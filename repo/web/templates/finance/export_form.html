@@ -1,0 +1,42 @@
+<div class="page-header">
+  <h1 class="page-title">Export Finance Report</h1>
+  <p class="page-subtitle">Generate a CSV or XLSX report of payment data</p>
+</div>
+
+<div class="form-wrapper">
+  <form method="POST" action="/finance/exports" class="form">
+    <input type="hidden" name="_idempotency_key" value="{{now}}">
+
+    <div class="form-group">
+      <label class="form-label" for="report_type">Report Type</label>
+      <select class="form-select" id="report_type" name="report_type" required>
+        <option value="payments">Payment Detail</option>
+        <option value="occupancy">Occupancy Summary</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="date_from">From Date</label>
+        <input class="form-input" id="date_from" name="date_from" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="date_to">To Date</label>
+        <input class="form-input" id="date_to" name="date_to" type="date">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="format">Output Format</label>
+      <div class="radio-group">
+        <label class="radio-label"><input type="radio" name="format" value="csv" checked> CSV</label>
+        <label class="radio-label"><input type="radio" name="format" value="xlsx"> XLSX</label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Generate &amp; Download</button>
+      <a href="/finance" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,49 @@
+# ── E2E test compose file ────────────────────────────────────────────────────
+# Usage (from repo root):
+#   docker compose -f docker-compose.e2e.yml run --rm playwright
+#
+# The `careops-e2e` service starts first (healthcheck-gated), then Playwright
+# connects to it at http://careops-e2e:8080.  No volumes are mounted; the DB
+# lives at /tmp inside the container and is discarded on exit.
+
+services:
+
+  careops-e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT:                        "8080"
+      DB_PATH:                     "/tmp/careops_e2e.db"
+      MIGRATIONS_PATH:             "/app/migrations"
+      SEEDS_PATH:                  "/app/seeds"
+      TEMPLATES_PATH:              "/app/web/templates"
+      STATIC_PATH:                 "/app/web/static"
+      MEDIA_PATH:                  "/tmp/e2e_media"
+      EXPORTS_PATH:                "/tmp/e2e_exports"
+      DIAGNOSTICS_PATH:            "/tmp/e2e_diag"
+      CONFIG_SNAP_PATH:            "/tmp/e2e_config_snaps"
+      SESSION_TTL_HOURS:           "24"
+      INACTIVITY_TIMEOUT_MINUTES:  "30"
+      COOKIE_NAME:                 "careops_session"
+      LOG_LEVEL:                   "error"
+      LOG_FORMAT:                  "json"
+      APP_ENV:                     "test"
+    # Override entrypoint so it runs as root (write to /tmp)
+    user: root
+    healthcheck:
+      test:         ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz"]
+      interval:     5s
+      timeout:      3s
+      retries:      12
+      start_period: 10s
+
+  playwright:
+    build:
+      context: ./e2e_tests
+      dockerfile: Dockerfile
+    environment:
+      BASE_URL: "http://careops-e2e:8080"
+    depends_on:
+      careops-e2e:
+        condition: service_healthy

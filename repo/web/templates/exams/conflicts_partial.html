@@ -1,0 +1,35 @@
+{{$s := index . "Session"}}
+<div id="conflicts-section">
+  <section class="section">
+    <h2 class="section-title">
+      Scheduling Conflicts
+      {{if $s.BlockingConflictCount}}
+        <span class="badge badge-danger">{{$s.BlockingConflictCount}} blocking</span>
+      {{else}}
+        <span class="badge badge-ok">None blocking</span>
+      {{end}}
+    </h2>
+    {{if $s.Conflicts}}
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Detail</th>
+            <th>Overlap</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="conflict-rows">
+          {{range $s.Conflicts}}
+          {{template "exams/conflict_row_partial" (dict "Conflict" .)}}
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <p class="td-empty">No conflicts detected for this session.</p>
+    {{end}}
+  </section>
+</div>

@@ -1,0 +1,47 @@
+{{$data := .Data}}
+{{$b := index $data "Batch"}}
+{{$payments := index $data "Payments"}}
+
+<div class="page-header">
+  <h1 class="page-title">Batch Import — {{$b.FileName}}</h1>
+  <p class="page-subtitle">{{$b.RecordCount}} rows · {{$b.Status}}</p>
+  <div class="page-actions">
+    <a href="/finance" class="btn btn-ghost">← Finance</a>
+  </div>
+</div>
+
+<div class="detail-card">
+  <h2 class="detail-card-title">Batch Details</h2>
+  <dl class="detail-list">
+    <dt>Status</dt><dd><span class="badge badge-status-{{$b.Status}}">{{$b.Status}}</span></dd>
+    <dt>File</dt><dd class="td-mono">{{$b.FileName}}</dd>
+    <dt>Rows</dt><dd>{{$b.RecordCount}}</dd>
+    <dt>Imported By</dt><dd>{{$b.ImportedByName}}</dd>
+    <dt>Imported At</dt><dd>{{$b.ImportedAt.Format "Jan 2, 2006 15:04"}}</dd>
+    {{if $b.ErrorDetail}}<dt>Error</dt><dd class="text-danger">{{$b.ErrorDetail}}</dd>{{end}}
+  </dl>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Payments Created</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Resident</th><th>Amount</th><th>Description</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range $payments}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td class="td-amount">{{.AmountDollars}}</td>
+          <td>{{.Description}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td><a href="/finance/payments/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="5" class="td-empty">No payments linked to this batch.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

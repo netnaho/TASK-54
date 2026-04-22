@@ -1,0 +1,44 @@
+{{$d := .Data}}
+<div class="page-header">
+  <h1 class="page-title">Bed Management</h1>
+  <p class="page-subtitle">Ward and room occupancy — click a bed for details</p>
+</div>
+
+<div class="stat-grid stat-grid--compact">
+  <a href="/beds" class="stat-card stat-blue stat-link">
+    <div class="stat-value">{{index $d "Total"}}</div>
+    <div class="stat-label">Total Beds</div>
+  </a>
+  <a href="/beds?status=occupied" class="stat-card stat-orange stat-link">
+    <div class="stat-value">{{index $d "Occupied"}}</div>
+    <div class="stat-label">Occupied</div>
+    <div class="stat-sub">{{pct (index $d "Occupied") (index $d "Total")}} occupancy</div>
+  </a>
+  <a href="/beds?status=available" class="stat-card stat-green stat-link">
+    <div class="stat-value">{{index $d "Available"}}</div>
+    <div class="stat-label">Available</div>
+  </a>
+</div>
+
+{{/* ── Filter bar ── */}}
+<div class="table-toolbar">
+  <span class="table-count">
+    {{len (index $d "Beds")}} beds
+    {{if index $d "WardFilter"}}in {{index $d "WardFilter"}}{{end}}
+  </span>
+  <div class="toolbar-filters">
+    <form hx-get="/beds" hx-target="#beds-table-area" hx-push-url="true" style="display:contents">
+      <select name="ward" class="filter-select"
+              onchange="this.form.requestSubmit()">
+        <option value="">All wards</option>
+        {{range (index $d "Wards")}}
+        <option value="{{.}}" {{if eq (index $d "WardFilter") .}}selected{{end}}>{{.}}</option>
+        {{end}}
+      </select>
+    </form>
+  </div>
+</div>
+
+<div id="beds-table-area">
+  {{template "beds/table_partial" $d}}
+</div>

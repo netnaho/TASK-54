@@ -1,0 +1,30 @@
+{{$data := .Data}}
+{{$cv := index $data "Config"}}
+
+<div class="page-header">
+  <h1 class="page-title">Edit Configuration</h1>
+  <p class="page-subtitle">{{$cv.Namespace}} / {{$cv.ConfigKey}}</p>
+</div>
+
+<div class="form-wrapper">
+  <div class="info-box">
+    <strong>Current value:</strong> <code>{{$cv.ConfigValue}}</code><br>
+    <strong>Description:</strong> {{if $cv.Description}}{{$cv.Description}}{{else}}—{{end}}<br>
+    <strong>Last changed by:</strong> {{$cv.ChangedByName}} on {{$cv.UpdatedAt.Format "Jan 2, 2006 15:04"}}
+  </div>
+
+  <form method="POST" action="/config-versions/{{$cv.ID}}" class="form">
+    <input type="hidden" name="row_version" value="{{$cv.RowVersion}}">
+
+    <div class="form-group">
+      <label class="form-label" for="config_value">New Value</label>
+      <input class="form-input" id="config_value" name="config_value" type="text"
+             value="{{$cv.ConfigValue}}" required autofocus>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="/config-versions" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,75 @@
+{{$residents := index .Data "Residents"}}
+{{$err := index .Data "FormError"}}
+{{$vals := index .Data "Values"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/service-delivery" class="btn btn-ghost btn-sm">← Back</a>
+    <div>
+      <h1 class="page-title">Record Alert Event</h1>
+      <p class="page-subtitle">Document a care alert requiring attention or follow-up</p>
+    </div>
+  </div>
+</div>
+
+<div class="form-card">
+  {{if $err}}
+  <div class="form-error-banner">{{$err}}</div>
+  {{end}}
+
+  <form method="POST" action="/service-delivery/alerts" class="form-body">
+    <input type="hidden" name="_idempotency_key" value="{{now}}">
+
+    <div class="form-group">
+      <label class="form-label" for="resident_id">Resident <span class="required">*</span></label>
+      <select name="resident_id" id="resident_id" class="form-select {{if $err}}input-error{{end}}" required>
+        <option value="">— Select resident —</option>
+        {{range $residents}}
+        <option value="{{.ID}}" {{if eq (index $vals "ResidentID") .ID}}selected{{end}}>
+          {{.FullName}} ({{.MRN}})
+        </option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="alert_type">Alert Type <span class="required">*</span></label>
+        <select name="alert_type" id="alert_type" class="form-select" required>
+          <option value="">— Select —</option>
+          <option value="fall_risk"    {{if eq (index $vals "AlertType") "fall_risk"   }}selected{{end}}>Fall Risk</option>
+          <option value="medication"   {{if eq (index $vals "AlertType") "medication"  }}selected{{end}}>Medication</option>
+          <option value="vitals"       {{if eq (index $vals "AlertType") "vitals"      }}selected{{end}}>Vitals Change</option>
+          <option value="wound_change" {{if eq (index $vals "AlertType") "wound_change"}}selected{{end}}>Wound Change</option>
+          <option value="discharge"    {{if eq (index $vals "AlertType") "discharge"   }}selected{{end}}>Discharge</option>
+          <option value="behavior"     {{if eq (index $vals "AlertType") "behavior"    }}selected{{end}}>Behavior</option>
+          <option value="other"        {{if eq (index $vals "AlertType") "other"       }}selected{{end}}>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="severity">Severity <span class="required">*</span></label>
+        <select name="severity" id="severity" class="form-select" required>
+          <option value="">— Select —</option>
+          <option value="low"      {{if eq (index $vals "Severity") "low"     }}selected{{end}}>Low</option>
+          <option value="medium"   {{if eq (index $vals "Severity") "medium"  }}selected{{end}}>Medium</option>
+          <option value="high"     {{if eq (index $vals "Severity") "high"    }}selected{{end}}>High</option>
+          <option value="critical" {{if eq (index $vals "Severity") "critical"}}selected{{end}}>Critical</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="message">Message <span class="required">*</span></label>
+      <textarea name="message" id="message" class="form-textarea" rows="4" maxlength="500"
+                placeholder="Describe what was observed and any immediate actions taken…"
+                required>{{index $vals "Message"}}</textarea>
+      <span class="form-hint">Max 500 characters</span>
+    </div>
+
+    <div class="form-actions">
+      <a href="/service-delivery" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-danger">Record Alert</button>
+    </div>
+  </form>
+</div>

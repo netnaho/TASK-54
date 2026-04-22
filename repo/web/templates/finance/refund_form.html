@@ -1,0 +1,29 @@
+{{$data := .Data}}
+{{$p := index $data "Payment"}}
+
+<div class="page-header">
+  <h1 class="page-title">Issue Refund</h1>
+  <p class="page-subtitle">Refund for {{$p.ResidentName}} — {{$p.AmountDollars}}</p>
+</div>
+
+<div class="form-wrapper">
+  <form method="POST" action="/finance/payments/{{$p.ID}}/refund" class="form">
+    <input type="hidden" name="_idempotency_key" value="{{now}}">
+
+    <div class="form-group">
+      <label class="form-label" for="amount">Refund Amount (USD)</label>
+      <input class="form-input" id="amount" name="amount" type="text" placeholder="0.00" required>
+      <p class="form-help">Original payment: {{$p.AmountDollars}}. Net (after prior refunds): {{$p.NetDollars}}.</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="reason">Reason</label>
+      <input class="form-input" id="reason" name="reason" type="text" placeholder="Reason for refund" required>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-danger">Issue Refund</button>
+      <a href="/finance/payments/{{$p.ID}}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  careops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: careops
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PORT:              "8080"
+      DB_PATH:           "/data/db/careops.db"
+      MIGRATIONS_PATH:   "/app/migrations"
+      SEEDS_PATH:        "/app/seeds"
+      TEMPLATES_PATH:    "/app/web/templates"
+      STATIC_PATH:       "/app/web/static"
+      MEDIA_PATH:        "/data/media"
+      EXPORTS_PATH:      "/data/exports"
+      DIAGNOSTICS_PATH:  "/data/diagnostics"
+      CONFIG_SNAP_PATH:  "/data/config_snapshots"
+      SESSION_TTL_HOURS:          "24"
+      INACTIVITY_TIMEOUT_MINUTES: "15"
+      COOKIE_NAME:                "careops_session"
+      FACILITY_TIMEZONE:          "America/New_York"
+      LOG_LEVEL:                  "info"
+      LOG_FORMAT:                 "json"
+      LOG_PATH:                   "/data/logs/app.log"
+      # development — runs without a FIELD_ENCRYPT_KEY so `docker-compose up`
+      # works out of the box.  Change to "production" for real deployments and
+      # supply FIELD_ENCRYPT_KEY below; startup hard-fails if the key is absent
+      # in production mode.
+      APP_ENV:                    "development"
+      # Required when APP_ENV=production.  Generate with:
+      #   openssl rand -hex 32
+      # FIELD_ENCRYPT_KEY: ""
+    volumes:
+      - careops_db:/data/db
+      - careops_media:/data/media
+      - careops_exports:/data/exports
+      - careops_diagnostics:/data/diagnostics
+      - careops_config_snapshots:/data/config_snapshots
+      - careops_logs:/data/logs
+    healthcheck:
+      test:     ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout:  5s
+      retries:  3
+      start_period: 15s
+
+volumes:
+  careops_db:
+    driver: local
+  careops_media:
+    driver: local
+  careops_exports:
+    driver: local
+  careops_diagnostics:
+    driver: local
+  careops_config_snapshots:
+    driver: local
+  careops_logs:
+    driver: local

@@ -1,0 +1,75 @@
+{{$residents := index .Data "Residents"}}
+{{$err := index .Data "FormError"}}
+{{$vals := index .Data "Values"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/service-delivery" class="btn btn-ghost btn-sm">← Back</a>
+    <div>
+      <h1 class="page-title">Record Care Checkpoint</h1>
+      <p class="page-subtitle">Document a quality-of-care observation for a resident</p>
+    </div>
+  </div>
+</div>
+
+<div class="form-card">
+  {{if $err}}
+  <div class="form-error-banner">{{$err}}</div>
+  {{end}}
+
+  <form method="POST" action="/service-delivery/checkpoints" class="form-body">
+    <input type="hidden" name="_idempotency_key" value="{{now}}">
+
+    <div class="form-group">
+      <label class="form-label" for="resident_id">Resident <span class="required">*</span></label>
+      <select name="resident_id" id="resident_id" class="form-select" required>
+        <option value="">— Select resident —</option>
+        {{range $residents}}
+        <option value="{{.ID}}" {{if eq (index $vals "ResidentID") .ID}}selected{{end}}>
+          {{.FullName}} ({{.MRN}})
+        </option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="checkpoint_type">Checkpoint Type <span class="required">*</span></label>
+        <select name="checkpoint_type" id="checkpoint_type" class="form-select" required>
+          <option value="">— Select —</option>
+          <option value="pain_assessment"   {{if eq (index $vals "CheckpointType") "pain_assessment"  }}selected{{end}}>Pain Assessment</option>
+          <option value="mobility_check"    {{if eq (index $vals "CheckpointType") "mobility_check"   }}selected{{end}}>Mobility Check</option>
+          <option value="skin_integrity"    {{if eq (index $vals "CheckpointType") "skin_integrity"   }}selected{{end}}>Skin Integrity</option>
+          <option value="wound_assessment"  {{if eq (index $vals "CheckpointType") "wound_assessment" }}selected{{end}}>Wound Assessment</option>
+          <option value="fall_risk_screen"  {{if eq (index $vals "CheckpointType") "fall_risk_screen" }}selected{{end}}>Fall Risk Screen</option>
+          <option value="functional_status" {{if eq (index $vals "CheckpointType") "functional_status"}}selected{{end}}>Functional Status</option>
+          <option value="nutrition_check"   {{if eq (index $vals "CheckpointType") "nutrition_check"  }}selected{{end}}>Nutrition Check</option>
+          <option value="engagement_check"  {{if eq (index $vals "CheckpointType") "engagement_check" }}selected{{end}}>Engagement Check</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="score">Score (1–5) <span class="required">*</span></label>
+        <div class="score-picker">
+          <label class="score-option"><input type="radio" name="score" value="1" {{if eq (index $vals "Score") "1"}}checked{{end}}><span class="score-pip score-pip-1">1</span></label>
+          <label class="score-option"><input type="radio" name="score" value="2" {{if eq (index $vals "Score") "2"}}checked{{end}}><span class="score-pip score-pip-2">2</span></label>
+          <label class="score-option"><input type="radio" name="score" value="3" {{if eq (index $vals "Score") "3"}}checked{{end}}><span class="score-pip score-pip-3">3</span></label>
+          <label class="score-option"><input type="radio" name="score" value="4" {{if eq (index $vals "Score") "4"}}checked{{end}}><span class="score-pip score-pip-4">4</span></label>
+          <label class="score-option"><input type="radio" name="score" value="5" {{if eq (index $vals "Score") "5"}}checked{{end}}><span class="score-pip score-pip-5">5</span></label>
+        </div>
+        <span class="form-hint">1 = poor · 3 = adequate · 5 = excellent</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="notes">Observation Notes</label>
+      <textarea name="notes" id="notes" class="form-textarea" rows="3"
+                placeholder="Describe what you observed…">{{index $vals "Notes"}}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <a href="/service-delivery" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save Checkpoint</button>
+    </div>
+  </form>
+</div>

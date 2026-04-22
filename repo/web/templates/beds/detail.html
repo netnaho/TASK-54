@@ -1,0 +1,38 @@
+{{$bed := index .Data "Bed"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/beds" class="btn btn-ghost btn-sm">← Beds</a>
+    <h1 class="page-title">{{$bed.Ward}} · Room {{$bed.RoomNumber}} · Bed {{$bed.BedLabel}}</h1>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h3 class="detail-card-title">Bed Details</h3>
+    <dl class="detail-list">
+      <dt>Ward</dt><dd>{{$bed.Ward}}</dd>
+      <dt>Room</dt><dd>{{$bed.RoomNumber}}</dd>
+      <dt>Bed Label</dt><dd class="td-primary">{{$bed.BedLabel}}</dd>
+      <dt>Bed Type</dt><dd><span class="badge badge-outline">{{$bed.BedType}}</span></dd>
+      <dt>Status</dt>
+      <dd>
+        {{if $bed.IsOccupied}}
+          <span class="status-badge status-occupied">Occupied</span>
+        {{else}}
+          <span class="status-badge status-available">Available</span>
+        {{end}}
+      </dd>
+      {{if $bed.IsOccupied}}
+      <dt>Current Resident</dt>
+      <dd class="td-primary">{{$bed.CurrentResidentName}}</dd>
+      {{end}}
+    </dl>
+  </div>
+</div>
+
+<div class="section">
+  <p class="text-muted" style="font-size:13px">
+    Admission history and transfer log will be available in Phase 2. Current occupancy is live from the admissions table.
+  </p>
+</div>

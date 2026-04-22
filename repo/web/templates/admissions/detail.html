@@ -1,0 +1,48 @@
+{{$res := index .Data "Resident"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/admissions" class="btn btn-ghost btn-sm">← Residents</a>
+    <div>
+      <h1 class="page-title">{{$res.FullName}}</h1>
+      <p class="page-subtitle">MRN: {{$res.MRN}}</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h3 class="detail-card-title">Resident Details</h3>
+    <dl class="detail-list">
+      <dt>Full Name</dt><dd class="td-primary">{{$res.FullName}}</dd>
+      <dt>MRN</dt><dd class="td-mono">{{$res.MRN}}</dd>
+      <dt>Date of Birth</dt><dd>{{$res.DateOfBirth}}</dd>
+      <dt>Gender</dt><dd>{{$res.Gender}}</dd>
+      <dt>Care Level</dt><dd><span class="badge badge-care badge-{{$res.CareLevel}}">{{$res.CareLevel}}</span></dd>
+      <dt>Primary Diagnosis</dt><dd>{{$res.PrimaryDiagnosis}}</dd>
+    </dl>
+  </div>
+
+  <div class="detail-card">
+    <h3 class="detail-card-title">Admission Status</h3>
+    <dl class="detail-list">
+      <dt>Status</dt>
+      <dd>
+        {{if $res.IsCurrentlyAdmitted}}
+          <span class="status-badge status-admitted">Currently Admitted</span>
+        {{else}}
+          <span class="status-badge status-inactive">Not Admitted</span>
+        {{end}}
+      </dd>
+      {{if $res.CurrentBed}}
+      <dt>Current Bed</dt><dd class="td-primary">{{$res.CurrentBed}}</dd>
+      {{end}}
+      {{if $res.AdmissionDate}}
+      <dt>Admitted</dt><dd>{{fmtDate $res.AdmissionDate}}</dd>
+      {{end}}
+    </dl>
+    <div style="margin-top:16px">
+      <a href="/service-delivery?resident_id={{$res.ID}}" class="btn btn-secondary btn-sm">View Service Orders</a>
+    </div>
+  </div>
+</div>

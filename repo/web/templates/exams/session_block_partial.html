@@ -1,0 +1,44 @@
+{{$s := index . "Session"}}
+<div class="card" id="session-block-card">
+  <h2 class="section-title">Time Block</h2>
+
+  <dl class="detail-list" style="margin-bottom:16px">
+    <dt>Planned Start</dt><dd>{{fmtFacilityDateTime $s.PlannedStart}}</dd>
+    <dt>Planned End</dt><dd>{{fmtFacilityDateTime $s.PlannedEnd}}</dd>
+    <dt>Room</dt><dd>{{$s.Room}}</dd>
+    <dt>Proctor</dt><dd>{{if $s.ProctorID}}{{$s.ProctorID}}{{else}}<span class="text-muted">—</span>{{end}}</dd>
+    <dt>Template v</dt><dd>{{$s.TemplateVersionSnapshot}}</dd>
+  </dl>
+
+  {{if $s.IsDraft}}
+  <form method="POST" action="/exams/sessions/{{$s.ID}}/block"
+        hx-post="/exams/sessions/{{$s.ID}}/block"
+        hx-target="#session-block-card"
+        hx-swap="outerHTML">
+    <input type="hidden" name="row_version" value="{{$s.RowVersion}}">
+
+    <div class="form-group">
+      <label class="form-label" for="sb-planned-start">New Planned Start</label>
+      <input id="sb-planned-start" name="planned_start" type="datetime-local" class="form-input"
+             value="{{toDatetimeLocal $s.PlannedStart}}" required>
+      <p class="form-hint">Facility local time. Conflict detection re-runs on save.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label" for="sb-room">Room</label>
+        <input id="sb-room" name="room" type="text" class="form-input"
+               value="{{$s.Room}}" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="sb-proctor">Proctor ID</label>
+        <input id="sb-proctor" name="proctor_id" type="text" class="form-input"
+               value="{{$s.ProctorID}}" maxlength="36"
+               placeholder="leave blank if none">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-secondary btn-sm">Update Block</button>
+  </form>
+  {{end}}
+</div>

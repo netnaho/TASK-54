@@ -1,0 +1,37 @@
+<div class="page-header">
+  <h1 class="page-title">Import Card-Terminal Batch</h1>
+  <p class="page-subtitle">Upload a CSV file from the card terminal</p>
+</div>
+
+{{$data := .Data}}
+
+<div class="form-wrapper">
+  <div class="info-box">
+    <strong>CSV Format:</strong> The file must have a header row:
+    <code>resident_mrn,amount_dollars,description,reference_number</code><br>
+    Example: <code>MRN-0001,150.00,Monthly fee,4242</code>
+  </div>
+
+  <form method="POST" action="/finance/batches" enctype="multipart/form-data" class="form">
+    <div class="form-group">
+      <label class="form-label" for="shift_id">Settlement Shift (optional)</label>
+      <select class="form-select" id="shift_id" name="shift_id">
+        <option value="">— no shift —</option>
+        {{range (index $data "OpenShifts")}}
+        <option value="{{.ID}}">{{.ShiftLabel}} – {{.ShiftDate}} (open)</option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="batch_file">CSV File <span class="form-required">*</span></label>
+      <input class="form-input" id="batch_file" name="batch_file" type="file" accept=".csv,text/csv" required>
+      <p class="form-help">Max 10 MB. Only .csv files accepted.</p>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Import Batch</button>
+      <a href="/finance" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,67 @@
+{{$data := .Data}}
+{{$s := index $data "Shift"}}
+{{$payments := index $data "Payments"}}
+
+<div class="page-header">
+  <h1 class="page-title">{{$s.ShiftLabel}} — {{$s.ShiftDate}}</h1>
+  <p class="page-subtitle">Settlement shift · {{$s.Status}}</p>
+  <div class="page-actions">
+    {{if eq $s.Status "open"}}
+    <form method="POST" action="/finance/shifts/{{$s.ID}}/close" class="form--inline">
+      <input type="hidden" name="reconciliation_notes" id="reconciliation_notes" value="">
+      <button type="button" class="btn btn-primary" onclick="promptClose(this.form)">Close Shift</button>
+    </form>
+    <script>
+    function promptClose(form) {
+      var notes = prompt('Reconciliation notes (optional):');
+      if (notes === null) return;
+      form.querySelector('[name=reconciliation_notes]').value = notes;
+      form.submit();
+    }
+    </script>
+    {{end}}
+    <a href="/finance/payments/new" class="btn btn-secondary">Record Payment</a>
+    <a href="/finance/shifts" class="btn btn-ghost">← Shifts</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h2 class="detail-card-title">Shift Summary</h2>
+    <dl class="detail-list">
+      <dt>Status</dt><dd><span class="badge badge-status-{{$s.Status}}">{{$s.Status}}</span></dd>
+      <dt>Shift</dt><dd>{{$s.ShiftLabel}}</dd>
+      <dt>Date</dt><dd>{{$s.ShiftDate}}</dd>
+      <dt>Total</dt><dd class="td-amount">{{$s.TotalDollars}}</dd>
+      <dt>Opened By</dt><dd>{{$s.OpenedByName}}</dd>
+      <dt>Opened At</dt><dd>{{$s.OpenedAt.Format "Jan 2, 2006 15:04"}}</dd>
+      <dt>Closed At</dt><dd>{{if $s.ClosedAt}}{{$s.ClosedAt.Format "Jan 2, 2006 15:04"}}{{else}}—{{end}}</dd>
+      {{if $s.ReconciliationNotes}}<dt>Notes</dt><dd>{{$s.ReconciliationNotes}}</dd>{{end}}
+    </dl>
+  </div>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Payments in this Shift</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Resident</th><th>Method</th><th>Amount</th><th>Description</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range $payments}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td><span class="badge badge-method">{{.PaymentMethod}}</span></td>
+          <td class="td-amount">{{.AmountDollars}}</td>
+          <td>{{.Description}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td><a href="/finance/payments/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="td-empty">No payments in this shift.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

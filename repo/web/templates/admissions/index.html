@@ -1,0 +1,39 @@
+{{$d := .Data}}
+<div class="page-header">
+  <h1 class="page-title">Admissions &amp; Residents</h1>
+  <p class="page-subtitle">All residents and their current admission status — click a name for details</p>
+</div>
+
+<div class="stat-grid stat-grid--compact">
+  <a href="/admissions?status=all" class="stat-card stat-blue stat-link">
+    <div class="stat-value">{{index $d "TotalResidents"}}</div>
+    <div class="stat-label">Total Residents</div>
+  </a>
+  <a href="/admissions?status=admitted" class="stat-card stat-green stat-link">
+    <div class="stat-value">{{index $d "ActiveAdmissions"}}</div>
+    <div class="stat-label">Currently Admitted</div>
+  </a>
+</div>
+
+{{/* ── Filter bar ── */}}
+<div class="table-toolbar">
+  <span class="table-count">{{len (index $d "Residents")}} shown</span>
+  <form hx-get="/admissions" hx-target="#admissions-table-area" hx-push-url="true" style="display:contents">
+    <div class="toolbar-filters">
+      <select name="care_level" class="filter-select" onchange="this.form.requestSubmit()">
+        <option value="">All care levels</option>
+        <option value="standard" {{if eq (index $d "CareLevel") "standard"}}selected{{end}}>Standard</option>
+        <option value="skilled"  {{if eq (index $d "CareLevel") "skilled" }}selected{{end}}>Skilled</option>
+        <option value="memory"   {{if eq (index $d "CareLevel") "memory"  }}selected{{end}}>Memory Care</option>
+      </select>
+      <select name="status" class="filter-select" onchange="this.form.requestSubmit()">
+        <option value="admitted" {{if eq (index $d "StatusFilter") "admitted"}}selected{{end}}>Admitted only</option>
+        <option value="all"      {{if eq (index $d "StatusFilter") "all"     }}selected{{end}}>All residents</option>
+      </select>
+    </div>
+  </form>
+</div>
+
+<div id="admissions-table-area">
+  {{template "admissions/table_partial" $d}}
+</div>

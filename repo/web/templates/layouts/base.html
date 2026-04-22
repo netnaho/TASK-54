@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{.Title}} — CareOps</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/vendor/htmx.min.js" defer></script>
+  <script src="/static/js/device-cache.js" defer></script>
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body class="app-layout">
+
+  {{template "nav" .}}
+
+  <div class="main-wrapper">
+    {{template "topbar" .}}
+
+    <main class="page-content" id="main-content">
+      {{template "flash" .}}
+      {{embed}}
+    </main>
+  </div>
+
+  <script>
+  // Mobile sidebar toggle
+  document.addEventListener('DOMContentLoaded', function() {
+    var toggle = document.getElementById('mobile-nav-toggle');
+    var sidebar = document.getElementById('sidebar');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+      });
+      document.addEventListener('click', function(e) {
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+          sidebar.classList.remove('open');
+        }
+      });
+    }
+  });
+  </script>
+</body>
+</html>

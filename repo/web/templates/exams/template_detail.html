@@ -1,0 +1,75 @@
+{{$d := .Data}}
+{{$t := index $d "Template"}}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">{{$t.Title}}</h1>
+      <p class="page-subtitle">Exam Template <span class="badge badge-info">v{{$t.TemplateVersion}}</span></p>
+    </div>
+    <a href="/exams/sessions/new?template_id={{$t.ID}}" class="btn btn-primary">Schedule Session</a>
+  </div>
+</div>
+
+{{if index $d "FormError"}}
+<div class="alert alert-danger">{{index $d "FormError"}}</div>
+{{end}}
+
+<div class="card" style="max-width:680px">
+  <h2 class="section-title" style="margin-bottom:16px">Edit Template</h2>
+  <p class="text-muted" style="margin-bottom:16px;font-size:13px">
+    Every save increments the version. Sessions record the version snapshot at generation time.
+  </p>
+
+  <form method="POST" action="/exams/templates/{{$t.ID}}">
+    <input type="hidden" name="template_version" value="{{$t.TemplateVersion}}">
+
+    <div class="form-group">
+      <label class="form-label" for="title">Title <span class="required">*</span></label>
+      <input id="title" name="title" type="text" class="form-input"
+             value="{{$t.Title}}" required maxlength="200">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">Description</label>
+      <textarea id="description" name="description" class="form-textarea" rows="3">{{$t.Description}}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Target Role</label>
+      <input type="text" class="form-input" value="{{$t.RoleScope}}" disabled>
+      <p class="form-hint">Role scope is set at creation and cannot be changed.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group">
+        <label class="form-label" for="passing_score">Passing Score (%)</label>
+        <input id="passing_score" name="passing_score" type="number" class="form-input"
+               value="{{$t.PassingScore}}" min="1" max="100" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="duration_minutes">Duration (minutes)</label>
+        <input id="duration_minutes" name="duration_minutes" type="number" class="form-input"
+               value="{{$t.DurationMinutes}}" min="5" max="480" required>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group">
+        <label class="form-label" for="window_start">Window Start (HH:MM)</label>
+        <input id="window_start" name="window_start" type="text" class="form-input"
+               value="{{$t.WindowStart}}" pattern="[0-9]{2}:[0-9]{2}" required>
+        <p class="form-hint">Facility local time</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="window_end">Window End (HH:MM)</label>
+        <input id="window_end" name="window_end" type="text" class="form-input"
+               value="{{$t.WindowEnd}}" pattern="[0-9]{2}:[0-9]{2}" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="/exams" class="btn btn-ghost">Back to Exams</a>
+      <button type="submit" class="btn btn-primary">Save (bumps version)</button>
+    </div>
+  </form>
+</div>

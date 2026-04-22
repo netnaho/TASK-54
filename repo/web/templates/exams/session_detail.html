@@ -1,0 +1,87 @@
+{{$d := .Data}}
+{{$s := index $d "Session"}}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">{{$s.TemplateTitle}}</h1>
+      <p class="page-subtitle">
+        Exam Session —
+        {{if $s.IsDraft}}
+          <span class="badge badge-warn">Draft</span>
+        {{else}}
+          <span class="badge badge-ok">Published</span>
+        {{end}}
+      </p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="/exams" class="btn btn-ghost">Back</a>
+      {{if $s.IsDraft}}
+      <form method="POST" action="/exams/sessions/{{$s.ID}}/publish" style="display:inline">
+        <input type="hidden" name="row_version" value="{{$s.RowVersion}}">
+        <button type="submit" class="btn btn-primary"
+          {{if $s.BlockingConflictCount}}disabled title="Resolve {{$s.BlockingConflictCount}} blocking conflict(s) first"{{end}}>
+          Publish Session
+        </button>
+      </form>
+      {{end}}
+    </div>
+  </div>
+</div>
+
+{{if $s.BlockingConflictCount}}
+<div class="alert alert-danger">
+  <strong>{{$s.BlockingConflictCount}} unresolved blocking conflict(s)</strong> — resolve all before publishing.
+</div>
+{{end}}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+  {{/* — Time block — */}}
+  <div id="session-block-card">
+    {{template "exams/session_block_partial" (dict "Session" $s)}}
+  </div>
+
+  {{/* — Candidates — */}}
+  <div class="card">
+    <h2 class="section-title">Candidates</h2>
+    {{if $s.IsDraft}}
+    <form method="POST" action="/exams/sessions/{{$s.ID}}/candidates/add" style="margin-bottom:12px"
+          hx-post="/exams/sessions/{{$s.ID}}/candidates/add"
+          hx-target="#conflicts-section"
+          hx-swap="outerHTML">
+      <div style="display:flex;gap:8px">
+        <select name="user_id" class="form-select" style="flex:1">
+          <option value="">— add candidate —</option>
+          {{range (index $d "Users")}}
+          <option value="{{.ID}}">{{.DisplayName}}</option>
+          {{end}}
+        </select>
+        <button type="submit" class="btn btn-secondary btn-sm">Add</button>
+      </div>
+    </form>
+    {{end}}
+    <ul class="candidate-list">
+      {{range $s.Candidates}}
+      <li class="candidate-item">
+        <span>{{.UserName}}</span>
+        {{if $s.IsDraft}}
+        <form method="POST" action="/exams/sessions/{{$s.ID}}/candidates/remove" style="display:inline"
+              hx-post="/exams/sessions/{{$s.ID}}/candidates/remove"
+              hx-target="#conflicts-section"
+              hx-swap="outerHTML">
+          <input type="hidden" name="user_id" value="{{.UserID}}">
+          <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-danger)">Remove</button>
+        </form>
+        {{end}}
+      </li>
+      {{else}}
+      <li class="td-empty" style="padding:8px 0">No candidates added.</li>
+      {{end}}
+    </ul>
+  </div>
+</div>
+
+{{/* — Conflicts — */}}
+<div id="conflicts-section">
+  {{template "exams/conflicts_partial" (dict "Session" $s)}}
+</div>

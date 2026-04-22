@@ -1,0 +1,52 @@
+{{$data := .Data}}
+{{$p := index $data "Payment"}}
+{{$refunds := index $data "Refunds"}}
+{{$fullRef := index $data "FullRef"}}
+
+<div class="page-header">
+  <h1 class="page-title">Payment — {{$p.AmountDollars}}</h1>
+  <p class="page-subtitle">{{$p.ResidentName}} · {{$p.PaymentMethod}}</p>
+  <div class="page-actions">
+    {{if eq $p.Status "settled"}}
+    <a href="/finance/payments/{{$p.ID}}/refund" class="btn btn-danger-outline">Issue Refund</a>
+    {{end}}
+    <a href="/finance" class="btn btn-ghost">← Finance</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h2 class="detail-card-title">Payment Details</h2>
+    <dl class="detail-list">
+      <dt>Status</dt><dd><span class="badge badge-status-{{$p.Status}}">{{$p.Status}}</span></dd>
+      <dt>Amount</dt><dd class="td-amount">{{$p.AmountDollars}}</dd>
+      <dt>Method</dt><dd><span class="badge badge-method">{{$p.PaymentMethod}}</span></dd>
+      <dt>Resident</dt><dd>{{$p.ResidentName}}</dd>
+      <dt>Reference</dt><dd class="td-mono">{{if $fullRef}}{{$fullRef}}{{else}}—{{end}}</dd>
+      <dt>Description</dt><dd>{{if $p.Description}}{{$p.Description}}{{else}}—{{end}}</dd>
+      <dt>Recorded By</dt><dd>{{$p.RecordedByName}}</dd>
+      <dt>Recorded At</dt><dd>{{$p.RecordedAt.Format "Jan 2, 2006 15:04"}}</dd>
+    </dl>
+  </div>
+
+  <div class="detail-card">
+    <h2 class="detail-card-title">Refunds</h2>
+    {{if $refunds}}
+    <table class="data-table">
+      <thead><tr><th>Amount</th><th>Reason</th><th>Issued By</th><th>Date</th></tr></thead>
+      <tbody>
+        {{range $refunds}}
+        <tr>
+          <td class="td-amount">{{.AmountDollars}}</td>
+          <td>{{.Reason}}</td>
+          <td>{{.ProcessedByName}}</td>
+          <td>{{.ProcessedAt.Format "Jan 2, 15:04"}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="text-muted">No refunds issued.</p>
+    {{end}}
+  </div>
+</div>

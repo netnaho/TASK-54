@@ -1,0 +1,48 @@
+{{$d := .Data}}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Service Delivery</h1>
+      <p class="page-subtitle">Execution metrics, work orders, care checkpoints, and alerts</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="/service-delivery/checkpoints/new" class="btn btn-secondary">+ Checkpoint</a>
+      <a href="/service-delivery/alerts/new" class="btn btn-primary">+ Alert</a>
+    </div>
+  </div>
+</div>
+
+{{/* ── Filter bar ── */}}
+<form class="filter-bar"
+      hx-get="/service-delivery"
+      hx-target="#sd-content"
+      hx-indicator="#sd-loading"
+      hx-push-url="true">
+  <div class="filter-bar-inner">
+    <input type="date" name="date_from" value="{{index $d "DateFrom"}}" class="filter-input" title="From date">
+    <span style="color:var(--color-text-muted);font-size:13px">to</span>
+    <input type="date" name="date_to"   value="{{index $d "DateTo"}}"   class="filter-input" title="To date">
+    <select name="status" class="filter-select" onchange="this.form.requestSubmit()">
+      <option value="active"    {{if eq (index $d "StatusFilter") "active"   }}selected{{end}}>Active orders</option>
+      <option value="completed" {{if eq (index $d "StatusFilter") "completed"}}selected{{end}}>Completed</option>
+      <option value=""          {{if eq (index $d "StatusFilter") ""         }}selected{{end}}>All statuses</option>
+    </select>
+    <select name="service_type" class="filter-select" onchange="this.form.requestSubmit()">
+      <option value="">All types</option>
+      <option value="PT"      {{if eq (index $d "ServiceType") "PT"     }}selected{{end}}>PT</option>
+      <option value="OT"      {{if eq (index $d "ServiceType") "OT"     }}selected{{end}}>OT</option>
+      <option value="ST"      {{if eq (index $d "ServiceType") "ST"     }}selected{{end}}>ST</option>
+      <option value="nursing" {{if eq (index $d "ServiceType") "nursing"}}selected{{end}}>Nursing</option>
+      <option value="aide"    {{if eq (index $d "ServiceType") "aide"   }}selected{{end}}>Aide</option>
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+    {{if index $d "HasFilters"}}
+    <a href="/service-delivery" class="btn btn-ghost btn-sm">Clear</a>
+    {{end}}
+  </div>
+  <span id="sd-loading" class="htmx-indicator loading-text">Loading…</span>
+</form>
+
+<div id="sd-content">
+  {{template "service_delivery/content_partial" $d}}
+</div>

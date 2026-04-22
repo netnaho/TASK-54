@@ -1,0 +1,99 @@
+{{$d := .Data}}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Exam Scheduler</h1>
+      <p class="page-subtitle">Day-view timeline — {{index $d "CurrentDate"}}</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <a href="/exams/scheduler?date={{index $d "PrevDate"}}" class="btn btn-ghost btn-sm">← Prev</a>
+      <form method="GET" action="/exams/scheduler" style="display:inline-flex;gap:6px">
+        <input type="date" name="date" value="{{index $d "CurrentDate"}}" class="form-input" style="width:160px">
+        <button type="submit" class="btn btn-secondary btn-sm">Go</button>
+      </form>
+      <a href="/exams/scheduler?date={{index $d "NextDate"}}" class="btn btn-ghost btn-sm">Next →</a>
+      <a href="/exams/sessions/new" class="btn btn-primary">+ Schedule Session</a>
+    </div>
+  </div>
+</div>
+
+{{$dayStartHour := index $d "DayStartHour"}}
+{{$dayMinutes   := index $d "DayMinutes"}}
+{{$swc          := index $d "SessionsWithConflicts"}}
+
+<div class="scheduler-container">
+  {{/* Hour gridlines and labels (8am–6pm) */}}
+  <div class="scheduler-gutter">
+    {{range $h := seq 8 18}}
+    <div class="scheduler-hour-tick" style="left:{{hourOffset $h $dayStartHour $dayMinutes}}">
+      <span class="scheduler-hour-label">{{printf "%02d:00" $h}}</span>
+    </div>
+    {{end}}
+  </div>
+
+  {{/* Session rows */}}
+  <div class="scheduler-rows">
+    {{if not $swc}}
+    <div class="scheduler-empty">No sessions scheduled for this day. <a href="/exams/sessions/new">Schedule one.</a></div>
+    {{end}}
+
+    {{range $item := $swc}}
+    {{$sess := $item.Session}}
+    {{$conflictCount := len $item.Conflicts}}
+    <div class="scheduler-row">
+      <div class="scheduler-row-label">
+        <a href="/exams/sessions/{{$sess.ID}}" class="scheduler-session-title">{{$sess.TemplateTitle}}</a>
+        <small class="text-muted">{{$sess.Room}}</small>
+      </div>
+      <div class="scheduler-track">
+        {{/* Hour gridlines behind block */}}
+        {{range $h := seq 8 18}}
+        <div class="scheduler-gridline" style="left:{{hourOffset $h $dayStartHour $dayMinutes}}"></div>
+        {{end}}
+        {{/* Session block */}}
+        <div class="scheduler-block{{if gt $conflictCount 0}} scheduler-block-conflict{{end}}{{if not $sess.IsDraft}} scheduler-block-published{{end}}"
+             style="left:{{timelineOffset $sess.PlannedStart $dayStartHour $dayMinutes}};width:{{timelineWidth $sess.PlannedStart $sess.PlannedEnd $dayMinutes}}"
+             title="{{$sess.TemplateTitle}} {{fmtFacilityTime $sess.PlannedStart}}–{{fmtFacilityTime $sess.PlannedEnd}}">
+          <a href="/exams/sessions/{{$sess.ID}}" class="scheduler-block-inner">
+            {{fmtFacilityTime $sess.PlannedStart}}
+            {{if gt $conflictCount 0}}<span class="conflict-badge">⚠ {{$conflictCount}}</span>{{end}}
+            {{if not $sess.IsDraft}}<span class="published-badge">✓</span>{{end}}
+          </a>
+        </div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+{{if $swc}}
+<section class="section" style="margin-top:32px">
+  <h2 class="section-title">Session Summary</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Session</th><th>Room</th><th>Start</th><th>End</th><th>Status</th><th>Conflicts</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range $item := $swc}}
+        <tr>
+          <td class="td-primary">{{$item.Session.TemplateTitle}}</td>
+          <td>{{$item.Session.Room}}</td>
+          <td>{{fmtFacilityTime $item.Session.PlannedStart}}</td>
+          <td>{{fmtFacilityTime $item.Session.PlannedEnd}}</td>
+          <td>
+            {{if $item.Session.IsDraft}}<span class="badge badge-warn">Draft</span>
+            {{else}}<span class="badge badge-ok">Published</span>{{end}}
+          </td>
+          <td>
+            {{if $item.Conflicts}}<span class="badge badge-danger">{{len $item.Conflicts}}</span>
+            {{else}}<span class="text-muted">—</span>{{end}}
+          </td>
+          <td><a href="/exams/sessions/{{$item.Session.ID}}" class="btn btn-ghost btn-sm">View</a></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+{{end}}

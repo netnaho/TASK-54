@@ -1,0 +1,83 @@
+<div class="page-header">
+  <h1 class="page-title">Reports</h1>
+  <p class="page-subtitle">Manage report definitions and view run history</p>
+  <div class="page-actions">
+    <a href="/reports/new" class="btn btn-primary">New Report Definition</a>
+  </div>
+</div>
+
+{{$data := .Data}}
+
+<section class="section">
+  <h2 class="section-title">Report Definitions</h2>
+  {{if index $data "Scheduled"}}
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Type</th><th>Schedule</th><th>Format</th><th>Active</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Scheduled")}}
+        <tr>
+          <td class="td-primary">{{.Name}}</td>
+          <td><span class="badge">{{.ReportType}}</span></td>
+          <td><code>{{if .ScheduleCron}}{{.ScheduleCron}}{{else}}—{{end}}</code></td>
+          <td>{{.OutputFormat}}</td>
+          <td>{{if .IsActive}}<span class="badge badge-status-complete">active</span>{{else}}<span class="badge badge-status-failed">inactive</span>{{end}}</td>
+          <td class="td-actions">
+            <form method="POST" action="/reports/{{.ID}}/run" style="display:inline"
+                  onsubmit="return confirm('Run this report now?')">
+              <button type="submit" class="btn btn-sm btn-primary">Run Now</button>
+            </form>
+            <a href="/reports/{{.ID}}/edit" class="btn btn-sm">Edit</a>
+            <form method="POST" action="/reports/{{.ID}}/toggle" style="display:inline">
+              <button type="submit" class="btn btn-sm">
+                {{if .IsActive}}Deactivate{{else}}Activate{{end}}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="text-muted">No report definitions yet. <a href="/reports/new">Create the first one.</a></p>
+  {{end}}
+</section>
+
+<section class="section">
+  <h2 class="section-title">Run History</h2>
+  {{if index $data "Runs"}}
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Type</th><th>Format</th><th>Triggered By</th><th>Status</th><th>Created</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Runs")}}
+        <tr>
+          <td><span class="badge">{{.ReportType}}</span></td>
+          <td>{{.OutputFormat}}</td>
+          <td>{{if .TriggeredByName}}{{.TriggeredByName}}{{else}}—{{end}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td>{{.CreatedAt.Format "Jan 2, 2006 15:04"}}</td>
+          <td>
+            {{if eq .Status "complete"}}
+            <a href="/reports/runs/download?run={{.ID}}" class="link-action">Download</a>
+            {{end}}
+            {{if .ErrorMessage}}
+            <span class="text-muted" title="{{.ErrorMessage}}">⚠ error</span>
+            {{end}}
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="text-muted">No report runs yet. Use <strong>Run Now</strong> on a definition above.</p>
+  {{end}}
+</section>

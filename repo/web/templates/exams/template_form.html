@@ -1,0 +1,71 @@
+{{$d := .Data}}
+<div class="page-header">
+  <h1 class="page-title">New Exam Template</h1>
+  <p class="page-subtitle">Define a reusable competency exam</p>
+</div>
+
+{{if index $d "FormError"}}
+<div class="alert alert-danger">{{index $d "FormError"}}</div>
+{{end}}
+
+{{$v := index $d "Values"}}
+
+<div class="card" style="max-width:680px">
+  <form method="POST" action="/exams/templates">
+    <div class="form-group">
+      <label class="form-label" for="title">Title <span class="required">*</span></label>
+      <input id="title" name="title" type="text" class="form-input"
+             value="{{index $v "title"}}" required maxlength="200"
+             placeholder="e.g. Medication Administration Competency">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">Description</label>
+      <textarea id="description" name="description" class="form-textarea" rows="3"
+                placeholder="Describe the exam purpose and scope">{{index $v "description"}}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="role_scope">Target Role <span class="required">*</span></label>
+      <input id="role_scope" name="role_scope" type="text" class="form-input"
+             value="{{index $v "role_scope"}}" required maxlength="100"
+             placeholder="e.g. nurse, therapist, aide">
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group">
+        <label class="form-label" for="passing_score">Passing Score (%) <span class="required">*</span></label>
+        <input id="passing_score" name="passing_score" type="number" class="form-input"
+               value="{{if index $v "passing_score"}}{{index $v "passing_score"}}{{else}}80{{end}}"
+               min="1" max="100" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="duration_minutes">Duration (minutes) <span class="required">*</span></label>
+        <input id="duration_minutes" name="duration_minutes" type="number" class="form-input"
+               value="{{if index $v "duration_minutes"}}{{index $v "duration_minutes"}}{{else}}60{{end}}"
+               min="5" max="480" required>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group">
+        <label class="form-label" for="window_start">Allowed Window Start (HH:MM) <span class="required">*</span></label>
+        <input id="window_start" name="window_start" type="text" class="form-input"
+               value="{{if index $v "window_start"}}{{index $v "window_start"}}{{else}}08:00{{end}}"
+               pattern="[0-9]{2}:[0-9]{2}" placeholder="08:00" required>
+        <p class="form-hint">Facility local time. Sessions must start within this window.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="window_end">Allowed Window End (HH:MM) <span class="required">*</span></label>
+        <input id="window_end" name="window_end" type="text" class="form-input"
+               value="{{if index $v "window_end"}}{{index $v "window_end"}}{{else}}17:00{{end}}"
+               pattern="[0-9]{2}:[0-9]{2}" placeholder="17:00" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="/exams" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Create Template</button>
+    </div>
+  </form>
+</div>

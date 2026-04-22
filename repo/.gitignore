@@ -1,0 +1,47 @@
+# Binaries
+/server
+/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+/vendor/
+
+# Go test artifacts
+*.test
+*.out
+coverage.html
+
+# SQLite databases (runtime data — not committed)
+*.db
+*.db-wal
+*.db-shm
+
+# Environment overrides
+.env
+.env.local
+
+# Docker volumes (local bind mounts for dev)
+/data/
+
+# Editor / OS artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# HTMX vendored file — fetched during Docker build; add manually for local dev.
+# See README for instructions.
+web/static/vendor/htmx.min.js
+
+# Log files
+*.log
+.tmp/
+
+# CLAUDE
+.claude/
+CLAUDE.md

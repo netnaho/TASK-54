@@ -1,0 +1,53 @@
+{{$data := .Data}}
+<div class="page-header">
+  <h1 class="page-title">Operations Dashboard</h1>
+  <p class="page-subtitle">Sunridge Rehab &amp; Long-Term Care — real-time facility overview</p>
+</div>
+
+<div class="stat-grid">
+  <a href="/occupancy" class="stat-card stat-blue stat-link">
+    <div class="stat-value">{{index $data "OccupiedBeds"}}</div>
+    <div class="stat-label">Occupied Beds</div>
+    <div class="stat-sub">of {{index $data "TotalBeds"}} total · {{pct (index $data "OccupiedBeds") (index $data "TotalBeds")}} rate</div>
+  </a>
+  <a href="/admissions" class="stat-card stat-green stat-link">
+    <div class="stat-value">{{index $data "TotalResidents"}}</div>
+    <div class="stat-label">Residents on Record</div>
+    <div class="stat-sub">{{index $data "OccupiedBeds"}} currently admitted</div>
+  </a>
+  <a href="/service-delivery?status=active" class="stat-card stat-orange stat-link">
+    <div class="stat-value">{{index $data "ActiveOrders"}}</div>
+    <div class="stat-label">Active Service Orders</div>
+    <div class="stat-sub">PT / OT / ST / Nursing</div>
+  </a>
+  <a href="/service-delivery" class="stat-card {{if gt (index $data "OpenAlerts") 0}}stat-red{{else}}stat-green{{end}} stat-link">
+    <div class="stat-value">{{index $data "OpenAlerts"}}</div>
+    <div class="stat-label">Open Alerts</div>
+    <div class="stat-sub">unresolved care events</div>
+  </a>
+  <a href="/users" class="stat-card stat-gray stat-link">
+    <div class="stat-value">{{index $data "TotalUsers"}}</div>
+    <div class="stat-label">Active Staff Users</div>
+  </a>
+  <a href="/exercise-library" class="stat-card stat-gray stat-link">
+    <div class="stat-value">{{index $data "ExerciseItems"}}</div>
+    <div class="stat-label">Exercise Library Items</div>
+  </a>
+  <a href="/exams" class="stat-card stat-gray stat-link">
+    <div class="stat-value">{{index $data "ExamTemplates"}}</div>
+    <div class="stat-label">Competency Templates</div>
+  </a>
+  <a href="/audit" class="stat-card stat-gray stat-link">
+    <div class="stat-value">{{index $data "TotalAuditLogs"}}</div>
+    <div class="stat-label">Audit Log Entries</div>
+  </a>
+</div>
+
+<div class="quick-nav-grid">
+  <a href="/admissions"       class="quick-nav-card">📋 Admissions &amp; Residents</a>
+  <a href="/beds"             class="quick-nav-card">🛏 Bed Management</a>
+  <a href="/occupancy"        class="quick-nav-card">📊 Occupancy Tracking</a>
+  <a href="/service-delivery" class="quick-nav-card">🩺 Service Delivery</a>
+  <a href="/exercise-library" class="quick-nav-card">💪 Exercise Library</a>
+  <a href="/audit"            class="quick-nav-card">🔍 Audit Log</a>
+</div>

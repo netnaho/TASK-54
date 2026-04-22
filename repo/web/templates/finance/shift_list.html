@@ -1,0 +1,60 @@
+<div class="page-header">
+  <h1 class="page-title">Settlement Shifts</h1>
+  <p class="page-subtitle">Open and close payment collection shifts</p>
+  <div class="page-actions">
+    <a href="/finance" class="btn btn-ghost">← Finance</a>
+  </div>
+</div>
+
+{{$data := .Data}}
+
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Open a Shift</h2>
+  </div>
+  <div class="form-wrapper form-wrapper--inline">
+    <form method="POST" action="/finance/shifts" class="form form--inline">
+      <div class="form-group">
+        <label class="form-label" for="shift_date">Date</label>
+        <input class="form-input" id="shift_date" name="shift_date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="shift_name">Shift</label>
+        <select class="form-select" id="shift_name" name="shift_name">
+          {{range (index $data "ShiftNames")}}
+          <option value="{{.Value}}">{{.Label}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Open / Get Shift</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">All Shifts</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Date</th><th>Shift</th><th>Opened By</th><th>Status</th><th>Total</th><th>Closed At</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Shifts")}}
+        <tr>
+          <td>{{.ShiftDate}}</td>
+          <td><span class="badge badge-outline">{{.ShiftLabel}}</span></td>
+          <td>{{.OpenedByName}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td class="td-amount">{{.TotalDollars}}</td>
+          <td>{{if .ClosedAt}}{{.ClosedAt.Format "Jan 2, 15:04"}}{{else}}—{{end}}</td>
+          <td><a href="/finance/shifts/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7" class="td-empty">No shifts recorded.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

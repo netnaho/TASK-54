@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h1 class="page-title">Staff Users</h1>
+  <p class="page-subtitle">Active system accounts and role assignments</p>
+  <div class="page-header-actions">
+    <a href="/users/new" class="btn btn-primary">+ Create user</a>
+  </div>
+</div>
+
+{{if .Flash}}
+<div class="alert alert-success" style="margin-bottom:1rem;">{{.Flash}}</div>
+{{end}}
+
+{{$data := .Data}}
+
+<div class="table-toolbar">
+  <span class="table-count">{{len (index $data "Users")}} users</span>
+</div>
+
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Roles</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range (index $data "Users")}}
+      <tr>
+        <td class="td-primary">{{.DisplayName}}</td>
+        <td>{{.Email}}</td>
+        <td>
+          {{range .Roles}}<span class="badge">{{.}}</span>{{end}}
+        </td>
+        <td>
+          {{if .IsActive}}
+            <span class="status-dot status-active">Active</span>
+          {{else}}
+            <span class="status-dot status-inactive">Disabled</span>
+          {{end}}
+        </td>
+        <td>{{.CreatedAt.Format "Jan 2, 2006"}}</td>
+        <td><a href="/users/{{.ID}}/reset-password" class="btn btn-ghost btn-sm">Reset password</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>

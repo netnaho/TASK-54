@@ -1,0 +1,41 @@
+{{$d := .}}
+{{$statusFilter := index $d "StatusFilter"}}
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Ward</th><th>Room</th><th>Bed</th><th>Type</th>
+        <th>Status</th><th>Current Resident</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range (index $d "Beds")}}
+      {{if or (eq $statusFilter "") (and (eq $statusFilter "occupied") .IsOccupied) (and (eq $statusFilter "available") (not .IsOccupied))}}
+      <tr>
+        <td>{{.Ward}}</td>
+        <td>{{.RoomNumber}}</td>
+        <td class="td-primary">{{.BedLabel}}</td>
+        <td><span class="badge badge-outline">{{.BedType}}</span></td>
+        <td>
+          {{if .IsOccupied}}
+            <span class="status-badge status-occupied">Occupied</span>
+          {{else}}
+            <span class="status-badge status-available">Available</span>
+          {{end}}
+        </td>
+        <td>
+          {{if .IsOccupied}}
+            <a href="/admissions" class="td-primary">{{.CurrentResidentName}}</a>
+          {{else}}
+            <span class="text-muted">—</span>
+          {{end}}
+        </td>
+        <td><a href="/beds/{{.ID}}" class="btn btn-ghost btn-sm">Details</a></td>
+      </tr>
+      {{end}}
+      {{else}}
+      <tr><td colspan="7" class="td-empty">No beds match the current filters.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>

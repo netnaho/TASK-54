@@ -1,0 +1,46 @@
+{{define "nav"}}
+<nav class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="sidebar-header">
+    <div class="brand-logo">CO</div>
+    <span class="brand-name">CareOps</span>
+  </div>
+
+  {{$u := .User}}
+
+  <ul class="nav-list">
+    <li class="nav-section-label">Operations</li>
+    <li><a href="/dashboard"        class="nav-link{{if eq .Title "Dashboard"}} active{{end}}">Dashboard</a></li>
+    <li><a href="/admissions"       class="nav-link{{if eq .Title "Admissions & Residents"}} active{{end}}">Admissions</a></li>
+    <li><a href="/beds"             class="nav-link{{if eq .Title "Bed Management"}} active{{end}}">Beds</a></li>
+    <li><a href="/occupancy"        class="nav-link{{if eq .Title "Occupancy Tracking"}} active{{end}}">Occupancy</a></li>
+    <li><a href="/service-delivery" class="nav-link{{if eq .Title "Service Delivery"}} active{{end}}">Service Delivery</a></li>
+
+    <li class="nav-section-label">Clinical</li>
+    <li><a href="/exercise-library" class="nav-link{{if eq .Title "Exercise Library"}} active{{end}}">Exercise Library</a></li>
+    <li><a href="/exams"            class="nav-link{{if eq .Title "Competency Exams"}} active{{end}}">Competency Exams</a></li>
+
+    <li class="nav-section-label">Finance &amp; Reports</li>
+    <li><a href="/finance"          class="nav-link{{if eq .Title "Finance & Payments"}} active{{end}}">Finance</a></li>
+    <li><a href="/reports"          class="nav-link{{if eq .Title "Reports"}} active{{end}}">Reports</a></li>
+
+    <li class="nav-section-label">System</li>
+    <li><a href="/users"            class="nav-link{{if eq .Title "Staff Users"}} active{{end}}">Staff Users</a></li>
+    <li><a href="/audit"            class="nav-link{{if eq .Title "Audit Log"}} active{{end}}">Audit Log</a></li>
+    <li><a href="/jobs"             class="nav-link{{if eq .Title "Job History"}} active{{end}}">Job History</a></li>
+    <li><a href="/config-versions"  class="nav-link{{if eq .Title "Configuration Versions"}} active{{end}}">Configuration</a></li>
+    <li><a href="/diagnostics"      class="nav-link{{if eq .Title "Diagnostics"}} active{{end}}">Diagnostics</a></li>
+  </ul>
+
+  {{if $u}}
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <span class="sidebar-user-name">{{$u.DisplayName}}</span>
+      <span class="sidebar-user-role">{{if $u.Roles}}{{index $u.Roles 0}}{{end}}</span>
+    </div>
+    <form method="POST" action="/logout">
+      <button type="submit" class="btn-logout">Sign out</button>
+    </form>
+  </div>
+  {{end}}
+</nav>
+{{end}}

@@ -1,0 +1,98 @@
+<div class="page-header">
+  <h1 class="page-title">Finance &amp; Payments</h1>
+  <p class="page-subtitle">Payment records, settlement shifts, and card-batch imports</p>
+  <div class="page-actions">
+    <a href="/finance/payments/new" class="btn btn-primary">Record Payment</a>
+    <a href="/finance/batches/new" class="btn btn-secondary">Import Card Batch</a>
+    <a href="/finance/shifts" class="btn btn-secondary">Shifts</a>
+    <a href="/finance/exports/new" class="btn btn-outline">Export Report</a>
+  </div>
+</div>
+
+{{$data := .Data}}
+
+<div class="stat-grid stat-grid--compact">
+  <div class="stat-card stat-green">
+    <div class="stat-value">{{index $data "TotalDollars"}}</div>
+    <div class="stat-label">Total Payments Shown</div>
+    <div class="stat-sub">last 50 records</div>
+  </div>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Settlement Shifts</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Date</th><th>Shift</th><th>Opened By</th><th>Status</th><th>Total</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Shifts")}}
+        <tr>
+          <td>{{.ShiftDate}}</td>
+          <td><span class="badge badge-outline">{{.ShiftLabel}}</span></td>
+          <td>{{.OpenedByName}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td class="td-amount">{{.TotalDollars}}</td>
+          <td><a href="/finance/shifts/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="td-empty">No shifts recorded.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Recent Payments</h2>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Resident</th><th>Method</th><th>Amount</th><th>Description</th><th>Status</th><th>Recorded</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Payments")}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td><span class="badge badge-method">{{.PaymentMethod}}</span></td>
+          <td class="td-amount">{{.AmountDollars}}</td>
+          <td>{{.Description}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td>{{.RecordedAt.Format "Jan 2, 15:04"}}</td>
+          <td><a href="/finance/payments/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7" class="td-empty">No payments recorded.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Card-Terminal Batches</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>File</th><th>Shift</th><th>Rows</th><th>Status</th><th>Imported</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Batches")}}
+        <tr>
+          <td class="td-mono">{{.FileName}}</td>
+          <td>{{.ShiftID}}</td>
+          <td>{{.RecordCount}}</td>
+          <td><span class="badge badge-status-{{.Status}}">{{.Status}}</span></td>
+          <td>{{.ImportedAt.Format "Jan 2, 15:04"}}</td>
+          <td><a href="/finance/batches/{{.ID}}" class="link-action">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="td-empty">No batches imported.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,8 @@
+{{define "flash"}}
+{{if .Flash}}
+<div class="flash flash-info" role="alert">
+  <span>{{.Flash}}</span>
+  <button class="flash-close" onclick="this.parentElement.remove()" aria-label="Dismiss">✕</button>
+</div>
+{{end}}
+{{end}}

@@ -1,0 +1,64 @@
+<div class="page-header">
+  <h1 class="page-title">Configuration Versions</h1>
+  <p class="page-subtitle">Versioned system configuration with snapshot and rollback</p>
+  <div class="page-actions">
+    <form method="POST" action="/config-versions/snapshot" style="display:inline">
+      <button type="submit" class="btn btn-secondary">Take Snapshot</button>
+    </form>
+  </div>
+</div>
+
+{{$data := .Data}}
+
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Namespace</th><th>Key</th><th>Value</th><th>Changed By</th><th>Updated</th><th>Version</th><th></th></tr>
+    </thead>
+    <tbody>
+      {{range (index $data "Configs")}}
+      <tr>
+        <td><span class="badge badge-outline">{{.Namespace}}</span></td>
+        <td class="td-mono">{{.ConfigKey}}</td>
+        <td>{{.ConfigValue}}</td>
+        <td>{{.ChangedByName}}</td>
+        <td>{{.UpdatedAt.Format "Jan 2, 2006"}}</td>
+        <td class="td-mono">v{{.RowVersion}}</td>
+        <td><a href="/config-versions/{{.ID}}/edit" class="link-action">Edit</a></td>
+      </tr>
+      {{else}}
+      <tr><td colspan="7" class="td-empty">No configuration entries.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Snapshots</h2>
+  {{if (index $data "Snapshots")}}
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Snapshot File</th><th>Created</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {{range (index $data "Snapshots")}}
+        <tr>
+          <td class="td-mono">{{.FileName}}</td>
+          <td>{{.CreatedAt.Format "Jan 2, 2006 15:04 UTC"}}</td>
+          <td>
+            <form method="POST" action="/config-versions/rollback" style="display:inline"
+                  onsubmit="return confirm('Roll back all config to this snapshot? This cannot be undone.')">
+              <input type="hidden" name="snapshot_file" value="{{.FileName}}">
+              <button type="submit" class="btn btn-danger-sm">Rollback</button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="text-muted">No snapshots yet. Click <strong>Take Snapshot</strong> to create one.</p>
+  {{end}}
+</section>

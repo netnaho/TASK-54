@@ -1,0 +1,45 @@
+{{$c := index . "Conflict"}}
+<tr id="conflict-{{$c.ID}}" class="{{if $c.Resolved}}conflict-resolved{{else}}conflict-open{{end}}">
+  <td>
+    <span class="badge conflict-type-{{$c.ConflictType}}">{{$c.ConflictType}}</span>
+    {{if $c.IsBlocking}}<span class="badge badge-danger" style="margin-left:4px">blocking</span>{{end}}
+  </td>
+  <td>
+    {{$c.Detail}}
+    {{if $c.ConflictingSessionTitle}}
+    <br><small class="text-muted">vs. "{{$c.ConflictingSessionTitle}}"</small>
+    {{end}}
+  </td>
+  <td>
+    {{if not $c.OverlapStart.IsZero}}
+    <small>{{fmtFacilityDateTime $c.OverlapStart}}<br>–{{fmtFacilityDateTime $c.OverlapEnd}}</small>
+    {{else}}
+    <small class="text-muted">—</small>
+    {{end}}
+  </td>
+  <td>
+    {{if $c.Resolved}}
+    <span class="status-dot status-active">Resolved</span>
+    {{if $c.ResolutionNotes}}<br><small class="text-muted">{{$c.ResolutionNotes}}</small>{{end}}
+    {{else}}
+    <span class="status-dot status-inactive">Open</span>
+    {{end}}
+  </td>
+  <td>
+    {{if not $c.Resolved}}
+    <form method="POST" action="/exams/conflicts/{{$c.ID}}/resolve"
+          hx-post="/exams/conflicts/{{$c.ID}}/resolve"
+          hx-target="#conflict-{{$c.ID}}"
+          hx-swap="outerHTML">
+      <input type="hidden" name="session_id" value="{{$c.SessionID}}">
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="text" name="resolution_notes" class="form-input" style="width:160px;font-size:12px"
+               placeholder="resolution notes (optional)">
+        <button type="submit" class="btn btn-secondary btn-sm">Resolve</button>
+      </div>
+    </form>
+    {{else}}
+    <span class="text-muted" style="font-size:12px">—</span>
+    {{end}}
+  </td>
+</tr>

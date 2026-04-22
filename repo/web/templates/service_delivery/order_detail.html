@@ -1,0 +1,92 @@
+{{$order := index .Data "Order"}}
+{{$records := index .Data "Records"}}
+{{$checkpoints := index .Data "Checkpoints"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/service-delivery" class="btn btn-ghost btn-sm">← Back</a>
+    <div>
+      <h1 class="page-title">Service Order — {{$order.ResidentName}}</h1>
+      <p class="page-subtitle">{{$order.ServiceType}} · {{$order.Frequency}}</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h3 class="detail-card-title">Order Details</h3>
+    <dl class="detail-list">
+      <dt>Resident</dt><dd class="td-primary">{{$order.ResidentName}}</dd>
+      <dt>Service Type</dt><dd><span class="badge badge-service">{{$order.ServiceType}}</span></dd>
+      <dt>Frequency</dt><dd>{{$order.Frequency}}</dd>
+      <dt>Status</dt><dd><span class="status-badge status-{{$order.Status}}">{{$order.Status}}</span></dd>
+      <dt>Ordered By</dt><dd>{{$order.OrderedByName}}</dd>
+      <dt>Start Date</dt><dd>{{fmtDateShort $order.StartDate}}</dd>
+      {{if $order.EndDate}}<dt>End Date</dt><dd>{{fmtDateShort $order.EndDate}}</dd>{{end}}
+      <dt>Instructions</dt><dd style="white-space:pre-wrap">{{$order.Instructions}}</dd>
+    </dl>
+  </div>
+</div>
+
+<section class="section">
+  <h2 class="section-title">Execution History</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Therapist</th><th>Scheduled</th><th>Performed</th>
+          <th>Timeliness</th><th>Duration</th><th>Status</th><th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range $records}}
+        <tr>
+          <td>{{.PerformedByName}}</td>
+          <td class="text-muted">
+            {{if not .ScheduledStart.IsZero}}{{.ScheduledStart.Format "Jan 2, 15:04"}}{{else}}—{{end}}
+          </td>
+          <td>{{.PerformedAt.Format "Jan 2, 15:04"}}</td>
+          <td>
+            {{if .ScheduledStart.IsZero}}
+              <span class="timeliness-badge timeliness-unscheduled">unscheduled</span>
+            {{else if le (.PerformedAt.Sub .ScheduledStart).Minutes 15.0}}
+              <span class="timeliness-badge timeliness-ontime">on-time</span>
+            {{else}}
+              <span class="timeliness-badge timeliness-late">late +{{printf "%.0f" (.PerformedAt.Sub .ScheduledStart).Minutes}}m</span>
+            {{end}}
+          </td>
+          <td>{{.DurationMinutes}} min</td>
+          <td><span class="status-dot status-{{.Status}}"></span> {{.Status}}</td>
+          <td class="td-truncate">{{.Notes}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7" class="td-empty">No execution records yet.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Recent Checkpoints for {{$order.ResidentName}}</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Type</th><th>Score</th><th>Checked By</th><th>Notes</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {{range $checkpoints}}
+        <tr>
+          <td>{{.CheckpointType}}</td>
+          <td><span class="score-badge score-{{scoreColor .Score}}">{{.Score}}/5</span></td>
+          <td>{{.CheckedByName}}</td>
+          <td class="td-truncate">{{.Notes}}</td>
+          <td class="text-muted">{{.CheckedAt.Format "Jan 2, 15:04"}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="5" class="td-empty">No checkpoints recorded for this resident.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+<div class="page-header">
+  <h1 class="page-title">Record Payment</h1>
+  <p class="page-subtitle">Enter payment details for a resident</p>
+</div>
+
+{{$data := .Data}}
+
+<div class="form-wrapper">
+  <form method="POST" action="/finance/payments" class="form">
+    <input type="hidden" name="_idempotency_key" value="{{now}}">
+
+    <div class="form-group">
+      <label class="form-label" for="resident_id">Resident</label>
+      <select class="form-select" id="resident_id" name="resident_id" required>
+        <option value="">— select resident —</option>
+        {{range (index $data "Residents")}}
+        <option value="{{.ID}}">{{.Name}} ({{.MRN}})</option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="shift_id">Settlement Shift</label>
+      <select class="form-select" id="shift_id" name="shift_id">
+        <option value="">— no shift / auto-open —</option>
+        {{range (index $data "OpenShifts")}}
+        <option value="{{.ID}}">{{.ShiftLabel}} – {{.ShiftDate}} (open)</option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="payment_method">Payment Method</label>
+        <select class="form-select" id="payment_method" name="payment_method" required>
+          {{range (index $data "PaymentMethods")}}
+          <option value="{{.Value}}">{{.Label}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="amount">Amount (USD)</label>
+        <input class="form-input" id="amount" name="amount" type="text" placeholder="0.00" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="reference_number">Reference Number <span class="form-hint">(check #, card last-4, transaction ID)</span></label>
+      <input class="form-input" id="reference_number" name="reference_number" type="text" placeholder="optional">
+      <p class="form-help">Sensitive values (card, check) are encrypted at rest.</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">Description</label>
+      <input class="form-input" id="description" name="description" type="text" placeholder="e.g. Monthly fee — October">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Record Payment</button>
+      <a href="/finance" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

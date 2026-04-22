@@ -1,0 +1,100 @@
+{{$ex := index .Data "Exercise"}}
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <a href="/exercise-library" class="btn btn-ghost btn-sm">← Library</a>
+    <h1 class="page-title" style="margin:0">{{$ex.Name}}</h1>
+    <button class="fav-btn fav-btn--lg {{if $ex.IsFavorite}}fav-btn--active{{end}}"
+            hx-post="/exercise-library/{{$ex.ID}}/favorite"
+            hx-target="this"
+            hx-swap="outerHTML"
+            title="{{if $ex.IsFavorite}}Remove from favorites{{else}}Add to favorites{{end}}">
+      {{if $ex.IsFavorite}}★ Favorited{{else}}☆ Add to favorites{{end}}
+    </button>
+  </div>
+</div>
+
+<div class="exercise-detail-layout">
+  {{/* ── Left: summary card ── */}}
+  <div class="exercise-detail-sidebar">
+    <div class="detail-card">
+      <div class="exercise-meta" style="margin-bottom:12px">
+        <span class="badge badge-category">{{$ex.Category}}</span>
+        <span class="badge badge-difficulty badge-{{$ex.Difficulty}}">{{$ex.Difficulty}}</span>
+      </div>
+      <dl class="detail-list">
+        {{if $ex.BodyPart}}<dt>Body part</dt><dd>{{$ex.BodyPart}}</dd>{{end}}
+        {{if $ex.DurationMinutes}}<dt>Duration</dt><dd>{{$ex.DurationMinutes}} min</dd>{{end}}
+      </dl>
+      {{if $ex.Tags}}
+      <div class="exercise-tags" style="margin-top:12px">
+        {{range $ex.Tags}}
+        <span class="tag-chip" style="border-color:{{.Color}};color:{{.Color}}">{{.Name}}</span>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
+
+    {{/* Media references */}}
+    {{if $ex.MediaReferences}}
+    <div class="detail-card" style="margin-top:16px">
+      <h4 class="detail-card-title">Media</h4>
+      <ul class="media-ref-list">
+        {{range $ex.MediaReferences}}
+        <li class="media-ref-item">
+          <span class="media-ref-type media-ref-type-{{.Type}}">{{.Type}}</span>
+          <a href="/media/{{.Filename}}" class="media-ref-link" target="_blank">{{.Caption}}</a>
+        </li>
+        {{end}}
+      </ul>
+      <p class="form-hint">Media is stored locally on this device's server. Files are served at <code>/media/:filename</code>.</p>
+    </div>
+    {{end}}
+  </div>
+
+  {{/* ── Right: full detail ── */}}
+  <div class="exercise-detail-main">
+    <div class="detail-card">
+      <h3 class="detail-card-title">Description</h3>
+      <p>{{$ex.Description}}</p>
+    </div>
+
+    <div class="detail-card" style="margin-top:16px">
+      <h3 class="detail-card-title">Instructions</h3>
+      <div class="exercise-instructions">{{$ex.Instructions}}</div>
+    </div>
+
+    {{if $ex.CoachingPoints}}
+    <div class="detail-card coaching-card" style="margin-top:16px">
+      <h3 class="detail-card-title">
+        <span class="coaching-icon">💡</span> Coaching Points
+      </h3>
+      <div class="coaching-content">{{$ex.CoachingPoints}}</div>
+    </div>
+    {{end}}
+
+    {{if $ex.Contraindications}}
+    <div class="detail-card contraindication-card" style="margin-top:16px">
+      <h3 class="detail-card-title">
+        <span class="contraindication-icon">⚠</span> Contraindications
+      </h3>
+      <div class="contraindication-content">{{$ex.Contraindications}}</div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+<script>
+// Cache this exercise detail for offline/quick access
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof DeviceCache !== 'undefined') {
+    var exerciseData = {
+      id: '{{$ex.ID}}',
+      name: '{{$ex.Name}}',
+      category: '{{$ex.Category}}',
+      cachedAt: new Date().toISOString()
+    };
+    DeviceCache.cacheExercise('{{$ex.ID}}', exerciseData);
+  }
+});
+</script>

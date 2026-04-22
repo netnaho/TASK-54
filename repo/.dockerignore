@@ -1,0 +1,28 @@
+# Git internals
+.git/
+.gitignore
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Runtime data not needed in the image
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Test artifacts
+unit_tests/
+API_tests/
+*.test
+coverage.html
+
+# Docs / scripts not needed in image
+docs/
+scripts/
+README.md
+
+# Go toolchain caches
+vendor/

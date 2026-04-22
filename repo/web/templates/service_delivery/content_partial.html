@@ -1,0 +1,155 @@
+{{$m := index . "Metrics"}}
+{{$orders := index . "Orders"}}
+{{$records := index . "Records"}}
+{{$alerts := index . "Alerts"}}
+{{$checkpoints := index . "Checkpoints"}}
+
+{{/* ── Metrics cards ── */}}
+<div class="stat-grid" style="margin-top:0">
+  <a href="/service-delivery?status=active" class="stat-card stat-blue stat-link">
+    <div class="stat-value">{{$m.ActiveOrders}}</div>
+    <div class="stat-label">Active Orders</div>
+    <div class="stat-sub">{{$m.TotalOrders}} total</div>
+  </a>
+  <div class="stat-card stat-green">
+    <div class="stat-value">{{pctF $m.CompletionRate}}</div>
+    <div class="stat-label">Completion Rate</div>
+    <div class="stat-sub">{{$m.CompletedExecutions}} of {{$m.TotalExecutions}} sessions</div>
+  </div>
+  <div class="stat-card {{if ge $m.OnTimeRate 0.8}}stat-green{{else if ge $m.OnTimeRate 0.6}}stat-orange{{else}}stat-red{{end}}">
+    <div class="stat-value">{{pctF $m.OnTimeRate}}</div>
+    <div class="stat-label">On-Time Rate</div>
+    <div class="stat-sub">{{$m.OnTimeCount}} / {{$m.ScheduledExecutions}} scheduled (≤15 min)</div>
+  </div>
+  <div class="stat-card {{if gt (len $alerts) 0}}stat-red{{else}}stat-gray{{end}}">
+    <div class="stat-value">{{len $alerts}}</div>
+    <div class="stat-label">Open Alerts</div>
+    <div class="stat-sub">unresolved</div>
+  </div>
+</div>
+
+{{/* ── Open Alerts ── */}}
+{{if $alerts}}
+<section class="section">
+  <h2 class="section-title">
+    Open Alerts
+    <span class="badge badge-red">{{len $alerts}}</span>
+    <a href="/service-delivery/alerts/new" class="btn btn-sm btn-danger" style="margin-left:auto">+ New Alert</a>
+  </h2>
+  <div class="alert-list">
+    {{range $alerts}}
+    <div class="alert-row alert-{{.Severity}}">
+      <span class="alert-severity-badge alert-sev-{{.Severity}}">{{.Severity}}</span>
+      <span class="alert-type">{{.AlertType}}</span>
+      <span class="alert-resident td-primary">{{.ResidentName}}</span>
+      <span class="alert-message">{{.Message}}</span>
+      <span class="alert-time text-muted">{{timeAgo .TriggeredAt}}</span>
+    </div>
+    {{end}}
+  </div>
+</section>
+{{else}}
+<section class="section">
+  <h2 class="section-title">Open Alerts <span class="badge">0</span></h2>
+  <div class="empty-state">No open alerts. <a href="/service-delivery/alerts/new">Record one</a> if needed.</div>
+</section>
+{{end}}
+
+{{/* ── Active Service Orders ── */}}
+<section class="section">
+  <h2 class="section-title">Service Orders</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Resident</th><th>Type</th><th>Frequency</th><th>Ordered By</th>
+          <th>Start</th><th>Status</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range $orders}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td><span class="badge badge-service">{{.ServiceType}}</span></td>
+          <td>{{.Frequency}}</td>
+          <td>{{.OrderedByName}}</td>
+          <td>{{fmtDateShort .StartDate}}</td>
+          <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
+          <td><a href="/service-delivery/orders/{{.ID}}" class="btn btn-ghost btn-sm">View</a></td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7" class="td-empty">No service orders match the current filters.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{{/* ── Recent Execution Records ── */}}
+<section class="section">
+  <h2 class="section-title">Recent Session Records</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Resident</th><th>Service</th><th>Therapist</th>
+          <th>Duration</th><th>Timeliness</th><th>Status</th><th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range $records}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td><span class="badge badge-service">{{.ServiceType}}</span></td>
+          <td>{{.PerformedByName}}</td>
+          <td>{{.DurationMinutes}} min</td>
+          <td>
+            {{if .ScheduledStart.IsZero}}
+              <span class="timeliness-badge timeliness-unscheduled">unscheduled</span>
+            {{else if le (.PerformedAt.Sub .ScheduledStart).Minutes 15.0}}
+              <span class="timeliness-badge timeliness-ontime">on-time</span>
+            {{else}}
+              <span class="timeliness-badge timeliness-late">late</span>
+            {{end}}
+          </td>
+          <td><span class="status-dot status-{{.Status}}"></span> {{.Status}}</td>
+          <td class="text-muted">{{.PerformedAt.Format "Jan 2, 15:04"}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7" class="td-empty">No execution records in this period.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{{/* ── Care Quality Checkpoints ── */}}
+<section class="section">
+  <h2 class="section-title">
+    Care Checkpoints
+    <a href="/service-delivery/checkpoints/new" class="btn btn-sm btn-secondary" style="margin-left:auto">+ New Checkpoint</a>
+  </h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr><th>Resident</th><th>Type</th><th>Score</th><th>Checked By</th><th>Notes</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {{range $checkpoints}}
+        <tr>
+          <td class="td-primary">{{.ResidentName}}</td>
+          <td>{{.CheckpointType}}</td>
+          <td>
+            <span class="score-badge score-{{scoreColor .Score}}">{{.Score}}/5</span>
+          </td>
+          <td>{{.CheckedByName}}</td>
+          <td class="td-truncate">{{.Notes}}</td>
+          <td class="text-muted">{{.CheckedAt.Format "Jan 2, 15:04"}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="6" class="td-empty">No checkpoints recorded in this period.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>

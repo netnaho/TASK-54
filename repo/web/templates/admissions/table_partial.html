@@ -1,0 +1,36 @@
+{{$d := .}}
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>MRN</th><th>Name</th><th>DOB</th><th>Care Level</th>
+        <th>Primary Diagnosis</th><th>Status</th><th>Bed</th><th>Admitted</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range (index $d "Residents")}}
+      <tr>
+        <td class="td-mono">{{.MRN}}</td>
+        <td class="td-primary">
+          <a href="/admissions/{{.ID}}">{{.FirstName}} {{.LastName}}</a>
+        </td>
+        <td>{{.DateOfBirth}}</td>
+        <td><span class="badge badge-care badge-{{.CareLevel}}">{{.CareLevel}}</span></td>
+        <td class="td-truncate">{{.PrimaryDiagnosis}}</td>
+        <td>
+          {{if .IsCurrentlyAdmitted}}
+            <span class="status-badge status-admitted">Admitted</span>
+          {{else}}
+            <span class="status-badge status-inactive">Not admitted</span>
+          {{end}}
+        </td>
+        <td>{{if .CurrentBed}}{{.CurrentBed}}{{else}}<span class="text-muted">—</span>{{end}}</td>
+        <td class="text-muted">{{if .AdmissionDate}}{{fmtDate .AdmissionDate}}{{else}}—{{end}}</td>
+        <td><a href="/admissions/{{.ID}}" class="btn btn-ghost btn-sm">View</a></td>
+      </tr>
+      {{else}}
+      <tr><td colspan="9" class="td-empty">No residents match the current filters.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,45 @@
+{{$exercises := index . "Exercises"}}
+{{if $exercises}}
+<div class="exercise-grid">
+  {{range $exercises}}
+  <div class="exercise-card {{if .IsFavorite}}exercise-card--fav{{end}}"
+       data-exercise-id="{{.ID}}"
+       data-cache-target="exercise">
+    <div class="exercise-card-header">
+      <a href="/exercise-library/{{.ID}}" class="exercise-name">{{.Name}}</a>
+      <button class="fav-btn {{if .IsFavorite}}fav-btn--active{{end}}"
+              hx-post="/exercise-library/{{.ID}}/favorite"
+              hx-target="this"
+              hx-swap="outerHTML"
+              title="{{if .IsFavorite}}Remove from favorites{{else}}Add to favorites{{end}}">
+        {{if .IsFavorite}}★{{else}}☆{{end}}
+      </button>
+    </div>
+    <div class="exercise-meta">
+      <span class="badge badge-category">{{.Category}}</span>
+      <span class="badge badge-difficulty badge-{{.Difficulty}}">{{.Difficulty}}</span>
+      {{if .BodyPart}}<span class="badge badge-outline">{{.BodyPart}}</span>{{end}}
+      {{if .DurationMinutes}}<span class="badge badge-outline">{{.DurationMinutes}} min</span>{{end}}
+    </div>
+    <p class="exercise-desc">{{.Description}}</p>
+    <div class="exercise-tags">
+      {{range .Tags}}
+      <span class="tag-chip" style="border-color:{{.Color}};color:{{.Color}}">{{.Name}}</span>
+      {{end}}
+    </div>
+    {{if .Contraindications}}
+    <div class="exercise-contraindications">
+      <span class="contraindication-icon">⚠</span> {{.Contraindications}}
+    </div>
+    {{end}}
+    <a href="/exercise-library/{{.ID}}" class="exercise-detail-link">View details →</a>
+  </div>
+  {{end}}
+</div>
+{{else}}
+<div class="empty-state">
+  <div class="empty-state-icon">📋</div>
+  <div class="empty-state-text">No exercises match the current filters.</div>
+  <a href="/exercise-library" class="btn btn-ghost btn-sm">Clear filters</a>
+</div>
+{{end}}

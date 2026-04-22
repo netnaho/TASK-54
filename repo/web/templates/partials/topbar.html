@@ -1,0 +1,19 @@
+{{define "topbar"}}
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+    <div class="topbar-title">{{.Title}}</div>
+  </div>
+  <div class="topbar-right">
+    {{if .User}}
+    <span class="topbar-user-name">{{.User.DisplayName}}</span>
+    <span class="topbar-roles">
+      {{range .User.Roles}}<span class="role-badge">{{.}}</span>{{end}}
+    </span>
+    <form action="/logout" method="POST" style="display:inline">
+      <button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+    {{end}}
+  </div>
+</header>
+{{end}}

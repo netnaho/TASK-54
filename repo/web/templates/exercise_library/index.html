@@ -1,0 +1,135 @@
+{{$d := .Data}}
+{{$f := index $d "Filter"}}
+<div class="page-header">
+  <h1 class="page-title">Exercise Library</h1>
+  <p class="page-subtitle">Browse, filter, and favorite exercises — includes contraindications and coaching points</p>
+</div>
+
+<div class="ex-layout">
+  {{/* ── Filter sidebar ── */}}
+  <aside class="ex-sidebar">
+    <form id="ex-filter-form"
+          hx-get="/exercise-library"
+          hx-target="#exercise-grid"
+          hx-indicator="#ex-loading"
+          hx-push-url="true">
+
+      <div class="filter-section">
+        <label class="filter-section-label">Search</label>
+        <input type="text" name="q" value="{{$f.Query}}"
+               class="filter-input filter-input--full"
+               placeholder="Name, description, contraindications…"
+               hx-get="/exercise-library"
+               hx-target="#exercise-grid"
+               hx-trigger="input changed delay:400ms"
+               hx-include="#ex-filter-form">
+      </div>
+
+      <div class="filter-section">
+        <label class="filter-section-label">Category</label>
+        <label class="filter-checkbox">
+          <input type="radio" name="category" value=""
+                 {{if eq $f.Category ""}}checked{{end}}
+                 onchange="document.getElementById('ex-filter-form').requestSubmit()">
+          <span>All categories</span>
+        </label>
+        {{range (index $d "Categories")}}
+        <label class="filter-checkbox">
+          <input type="radio" name="category" value="{{.}}"
+                 {{if eq $f.Category .}}checked{{end}}
+                 onchange="document.getElementById('ex-filter-form').requestSubmit()">
+          <span>{{.}}</span>
+        </label>
+        {{end}}
+      </div>
+
+      <div class="filter-section">
+        <label class="filter-section-label">Difficulty</label>
+        <label class="filter-checkbox"><input type="radio" name="difficulty" value="" {{if eq $f.Difficulty ""}}checked{{end}} onchange="document.getElementById('ex-filter-form').requestSubmit()"><span>All</span></label>
+        <label class="filter-checkbox"><input type="radio" name="difficulty" value="beginner" {{if eq $f.Difficulty "beginner"}}checked{{end}} onchange="document.getElementById('ex-filter-form').requestSubmit()"><span>Beginner</span></label>
+        <label class="filter-checkbox"><input type="radio" name="difficulty" value="intermediate" {{if eq $f.Difficulty "intermediate"}}checked{{end}} onchange="document.getElementById('ex-filter-form').requestSubmit()"><span>Intermediate</span></label>
+        <label class="filter-checkbox"><input type="radio" name="difficulty" value="advanced" {{if eq $f.Difficulty "advanced"}}checked{{end}} onchange="document.getElementById('ex-filter-form').requestSubmit()"><span>Advanced</span></label>
+      </div>
+
+      {{if (index $d "BodyParts")}}
+      <div class="filter-section">
+        <label class="filter-section-label">Body Part</label>
+        <select name="body_part" class="filter-select filter-select--full"
+                onchange="document.getElementById('ex-filter-form').requestSubmit()">
+          <option value="">All body parts</option>
+          {{range (index $d "BodyParts")}}
+          <option value="{{.}}" {{if eq $f.BodyPart .}}selected{{end}}>{{.}}</option>
+          {{end}}
+        </select>
+      </div>
+      {{end}}
+
+      <div class="filter-section">
+        <label class="filter-section-label">Tags</label>
+        <select name="tag" class="filter-select filter-select--full"
+                onchange="document.getElementById('ex-filter-form').requestSubmit()">
+          <option value="">All tags</option>
+          {{range (index $d "Tags")}}
+          <option value="{{.ID}}" {{if eq $f.TagID .ID}}selected{{end}}>{{.Name}}</option>
+          {{end}}
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <label class="filter-checkbox">
+          <input type="checkbox" name="favorites" value="1"
+                 {{if $f.FavoritesOnly}}checked{{end}}
+                 onchange="document.getElementById('ex-filter-form').requestSubmit()">
+          <span>★ Favorites only</span>
+        </label>
+      </div>
+
+      {{if index $d "HasFilters"}}
+      <a href="/exercise-library" class="btn btn-ghost btn-sm" style="width:100%;text-align:center;margin-top:8px">Clear filters</a>
+      {{end}}
+    </form>
+
+    {{/* Device cache management */}}
+    <div class="cache-panel">
+      <div class="cache-panel-title">Device Cache</div>
+      <div class="cache-panel-info" id="cache-info">checking…</div>
+      <button class="btn btn-ghost btn-sm" onclick="clearDeviceCache()" style="width:100%;margin-top:6px">
+        Clear Device Cache
+      </button>
+      <p class="cache-panel-hint">Clears locally cached exercise content on this browser. Does not affect server data. Use on shared workstations before signing out.</p>
+    </div>
+  </aside>
+
+  {{/* ── Exercise grid ── */}}
+  <main class="ex-main">
+    <div id="ex-loading" class="htmx-indicator loading-bar"></div>
+    <div id="exercise-grid">
+      {{template "exercise_library/grid_partial" $d}}
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof DeviceCache !== 'undefined') {
+    DeviceCache.getStats().then(function(s) {
+      var el = document.getElementById('cache-info');
+      if (el) el.textContent = s.count + ' item(s) · ~' + s.sizeMB + ' MB';
+    });
+  } else {
+    var el = document.getElementById('cache-info');
+    if (el) el.textContent = 'not available';
+  }
+});
+function clearDeviceCache() {
+  if (typeof DeviceCache !== 'undefined') {
+    DeviceCache.clearAll().then(function() {
+      var el = document.getElementById('cache-info');
+      if (el) el.textContent = '0 items · 0 MB';
+      alert('Device cache cleared.');
+    });
+  } else {
+    alert('Cache API not available in this browser.');
+  }
+}
+</script>

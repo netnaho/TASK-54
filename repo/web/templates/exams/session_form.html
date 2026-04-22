@@ -1,0 +1,73 @@
+{{$d := .Data}}
+<div class="page-header">
+  <h1 class="page-title">Generate Exam Session</h1>
+  <p class="page-subtitle">Schedule a draft session from a template. Conflict detection runs automatically.</p>
+</div>
+
+{{if index $d "FormError"}}
+<div class="alert alert-danger">{{index $d "FormError"}}</div>
+{{end}}
+
+{{$v := index $d "Values"}}
+
+<div class="card" style="max-width:680px">
+  <form method="POST" action="/exams/sessions">
+    <div class="form-group">
+      <label class="form-label" for="template_id">Exam Template <span class="required">*</span></label>
+      <select id="template_id" name="template_id" class="form-select" required>
+        <option value="">— select template —</option>
+        {{range (index $d "Templates")}}
+        <option value="{{.ID}}"
+          {{if eq (index $v "template_id") .ID}}selected{{end}}>
+          {{.Title}} ({{.DurationMinutes}} min, v{{.TemplateVersion}})
+        </option>
+        {{end}}
+      </select>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group">
+        <label class="form-label" for="planned_start">Planned Start <span class="required">*</span></label>
+        <input id="planned_start" name="planned_start" type="datetime-local" class="form-input"
+               value="{{index $v "planned_start"}}" required>
+        <p class="form-hint">Facility local time. Must fall within the template's allowed window.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="room">Room <span class="required">*</span></label>
+        <input id="room" name="room" type="text" class="form-input"
+               value="{{index $v "room"}}" required maxlength="100"
+               placeholder="e.g. Conference Room A">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="proctor_id">Proctor</label>
+      <select id="proctor_id" name="proctor_id" class="form-select">
+        <option value="">— no proctor assigned —</option>
+        {{range (index $d "Users")}}
+        <option value="{{.ID}}"
+          {{if eq (index $v "proctor_id") .ID}}selected{{end}}>
+          {{.DisplayName}}
+        </option>
+        {{end}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Candidates</label>
+      <div class="checkbox-list">
+        {{range (index $d "Users")}}
+        <label class="checkbox-label">
+          <input type="checkbox" name="candidate_ids" value="{{.ID}}"> {{.DisplayName}}
+        </label>
+        {{end}}
+      </div>
+      <p class="form-hint">Candidates assigned to overlapping sessions will generate conflicts.</p>
+    </div>
+
+    <div class="form-actions">
+      <a href="/exams" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Generate Draft Session</button>
+    </div>
+  </form>
+</div>

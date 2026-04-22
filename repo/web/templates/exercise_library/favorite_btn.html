@@ -1,0 +1,9 @@
+{{$id := index . "ExerciseID"}}
+{{$fav := index . "IsFavorite"}}
+<button class="fav-btn {{if $fav}}fav-btn--active{{end}}"
+        hx-post="/exercise-library/{{$id}}/favorite"
+        hx-target="this"
+        hx-swap="outerHTML"
+        title="{{if $fav}}Remove from favorites{{else}}Add to favorites{{end}}">
+  {{if $fav}}★{{else}}☆{{end}}
+</button>

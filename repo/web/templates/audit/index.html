@@ -1,0 +1,86 @@
+{{$data := .Data}}
+{{$f := index $data "Filter"}}
+
+<div class="page-header">
+  <h1 class="page-title">Audit Log</h1>
+  <p class="page-subtitle">Immutable record of all system actions — {{index $data "Count"}} total entries</p>
+</div>
+
+<div class="filter-bar">
+  <form method="GET" action="/audit" class="filter-form">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label" for="entity_type">Record Type</label>
+        <input class="form-input form-input--sm" id="entity_type" name="entity_type"
+               type="text" placeholder="e.g. payments" value="{{$f.EntityType}}">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="entity_id">Record ID</label>
+        <input class="form-input form-input--sm" id="entity_id" name="entity_id"
+               type="text" placeholder="UUID" value="{{$f.EntityID}}">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="resident_id">Resident ID</label>
+        <input class="form-input form-input--sm" id="resident_id" name="resident_id"
+               type="text" placeholder="Resident UUID" value="{{$f.ResidentID}}">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="date_from">From</label>
+        <input class="form-input form-input--sm" id="date_from" name="date_from"
+               type="date" value="{{$f.DateFrom}}">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="date_to">To</label>
+        <input class="form-input form-input--sm" id="date_to" name="date_to"
+               type="date" value="{{$f.DateTo}}">
+      </div>
+      <div class="filter-actions">
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+        {{if index $data "HasFilters"}}<a href="/audit" class="btn btn-ghost btn-sm">Clear</a>{{end}}
+      </div>
+    </div>
+  </form>
+</div>
+
+{{if index $data "HasFilters"}}
+<div class="filter-active-banner">
+  Active filters:
+  {{if $f.EntityType}}<span class="badge badge-outline">type: {{$f.EntityType}}</span>{{end}}
+  {{if $f.EntityID}}<span class="badge badge-outline">id: {{$f.EntityID}}</span>{{end}}
+  {{if $f.ResidentID}}<span class="badge badge-outline">resident: {{$f.ResidentID}}</span>{{end}}
+  {{if $f.DateFrom}}<span class="badge badge-outline">from: {{$f.DateFrom}}</span>{{end}}
+  {{if $f.DateTo}}<span class="badge badge-outline">to: {{$f.DateTo}}</span>{{end}}
+</div>
+{{end}}
+
+<div class="table-wrapper">
+  <table class="data-table data-table--dense">
+    <thead>
+      <tr>
+        <th>Time</th><th>User</th><th>Action</th><th>Record Type</th><th>Record ID</th><th>Outcome</th><th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range (index $data "Logs")}}
+      <tr>
+        <td class="td-mono td-nowrap">{{.OccurredAt.Format "Jan 2, 15:04:05"}}</td>
+        <td>{{if .UserName}}{{.UserName}}{{else}}<span class="text-muted">system</span>{{end}}</td>
+        <td><span class="badge badge-action">{{.Action}}</span></td>
+        <td class="td-mono">{{if .EntityType}}{{.EntityType}}{{else}}—{{end}}</td>
+        <td class="td-mono td-truncate" title="{{.EntityID}}">{{if .EntityID}}{{.EntityID}}{{else}}—{{end}}</td>
+        <td>
+          {{if eq .Outcome "success"}}<span class="badge badge-status-active">ok</span>
+          {{else if eq .Outcome "failure"}}<span class="badge badge-status-inactive">fail</span>
+          {{else if eq .Outcome "error"}}<span class="badge badge-status-inactive">err</span>
+          {{else}}<span class="badge badge-status-active">ok</span>{{end}}
+        </td>
+        <td class="td-truncate" title="{{.Details}}">{{if .Details}}{{.Details}}{{else}}—{{end}}</td>
+      </tr>
+      {{else}}
+      <tr><td colspan="7" class="td-empty">No audit entries match the current filter.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<p class="text-muted text-sm">Showing up to 200 most recent matching entries. Audit records are immutable — no update or delete paths exist in the application.</p>
