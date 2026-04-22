@@ -23,7 +23,7 @@ test('admin creates exam template then session', async ({ page }) => {
   await page.fill('#window_start', '08:00');
   await page.fill('#window_end', '17:00');
 
-  await page.click('button[type="submit"]');
+  await page.click('button:has-text("Create Template")');
 
   // Redirected to template detail
   await expect(page).toHaveURL(/\/exams\/templates\/[a-z0-9-]+/);
@@ -40,7 +40,7 @@ test('admin creates exam template then session', async ({ page }) => {
   await page.fill('#planned_start', '2030-09-15T09:00');
   await page.fill('#room', 'PW Test Room 101');
 
-  await page.click('button[type="submit"]');
+  await page.click('button:has-text("Generate Draft Session")');
 
   // Redirected to session detail
   await expect(page).toHaveURL(/\/exams\/sessions\/[a-z0-9-]+/);

@@ -28,7 +28,7 @@ test('finance_clerk creates cash payment and sees detail', async ({ page }) => {
   await page.fill('#description', 'E2E test payment');
 
   // Submit
-  await page.click('button[type="submit"]');
+  await page.click('button:has-text("Record Payment")');
 
   // Redirected to payment detail (URL contains /finance/payments/<id>)
   await expect(page).toHaveURL(/\/finance\/payments\/[a-z0-9-]+/);

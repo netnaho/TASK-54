@@ -47,8 +47,8 @@ test('exercise filter HTMX partial swap updates grid without full reload', async
 
   // Nav sidebar is still attached — no full page reload happened
   await expect(page.locator('nav.sidebar#sidebar')).toBeVisible();
-  // fullReloadCount starts at 1 (initial page load). Must not increase.
-  expect(fullReloadCount).toBe(1);
+  // No full-page reload should have occurred (HTMX does a partial swap).
+  expect(fullReloadCount).toBe(0);
 });
 
 test('favorite toggle HTMX swaps star button in place', async ({ page }) => {

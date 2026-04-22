@@ -21,7 +21,7 @@ test('admin takes config snapshot and it appears in listing', async ({ page }) =
 
   // Snapshot row appears in the Snapshots section
   // The filename always starts with "config_snapshot_"
-  await expect(page.locator('.data-table td.td-mono').first()).toContainText('config_snapshot_');
+  await expect(page.locator('.data-table td.td-mono').filter({ hasText: /config_snapshot_/ })).toBeVisible();
 });
 
 test('non-admin (nurse) cannot access /config-versions', async ({ page }) => {
