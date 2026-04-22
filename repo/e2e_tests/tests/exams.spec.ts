@@ -33,8 +33,10 @@ test('admin creates exam template then session', async ({ page }) => {
   await page.goto('/exams/sessions/new');
   await expect(page.locator('h1.page-title')).toContainText('Generate Exam Session');
 
-  // Select the template we just created (it will be in the dropdown)
-  await page.locator('#template_id').selectOption({ label: /PW Competency Check/ });
+  // Select the template we just created — selectOption() does not accept regex for label,
+  // so locate the option by partial text and then select by its value (UUID).
+  const templateValue = await page.locator('#template_id option').filter({ hasText: 'PW Competency Check' }).getAttribute('value');
+  await page.locator('#template_id').selectOption(templateValue!);
 
   // Set a future date/time within the allowed window.
   // Use evaluate() to set datetime-local value directly — page.fill() can silently
