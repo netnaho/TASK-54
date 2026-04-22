@@ -18,7 +18,8 @@ COPY . .
 
 # Fetch HTMX and write it into the source tree before building.
 # This is a build-time internet fetch; the runtime image has no internet access.
-RUN wget -q -O web/static/vendor/htmx.min.js \
+RUN mkdir -p web/static/vendor && \
+    wget -q -O web/static/vendor/htmx.min.js \
       https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js
 
 # Build the statically linked binary.
