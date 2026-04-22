@@ -25,8 +25,8 @@ test('admin creates exam template then session', async ({ page }) => {
 
   await page.click('button:has-text("Create Template")');
 
-  // Redirected to template detail
-  await expect(page).toHaveURL(/\/exams\/templates\/[a-z0-9-]+/);
+  // Redirected to template detail — UUID has 8+ hex chars before the first dash
+  await expect(page).toHaveURL(/\/exams\/templates\/[a-f0-9]{8}-/);
   await expect(page.locator('h1.page-title')).toContainText('PW Competency Check');
 
   // ── Create session from that template ────────────────────────────
@@ -36,14 +36,17 @@ test('admin creates exam template then session', async ({ page }) => {
   // Select the template we just created (it will be in the dropdown)
   await page.locator('#template_id').selectOption({ label: /PW Competency Check/ });
 
-  // Set a future date/time within the allowed window
-  await page.fill('#planned_start', '2030-09-15T09:00');
+  // Set a future date/time within the allowed window.
+  // Use evaluate() to set datetime-local value directly — page.fill() can silently
+  // fail for datetime-local inputs in headless Chromium, leaving the field empty
+  // and triggering required-field validation that blocks form submission.
+  await page.evaluate('document.getElementById("planned_start").value = "2030-09-15T09:00"');
   await page.fill('#room', 'PW Test Room 101');
 
   await page.click('button:has-text("Generate Draft Session")');
 
-  // Redirected to session detail
-  await expect(page).toHaveURL(/\/exams\/sessions\/[a-z0-9-]+/);
+  // Redirected to session detail — UUID has 8+ hex chars before the first dash
+  await expect(page).toHaveURL(/\/exams\/sessions\/[a-f0-9]{8}-/);
 
   // Session detail shows template title and room
   await expect(page.locator('h1.page-title')).toContainText('PW Competency Check');
